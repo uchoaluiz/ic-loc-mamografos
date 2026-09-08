@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Formulação matemática — Rede de mamografia</title>
+  <meta
+    name="description"
+    content="Formulação matemática complementar do modelo de localização e alocação de mamógrafos com equidade baseada no EDE de Kolm-Pollak."
+  />
+
+  <!-- MathJax: renderização de LaTeX no navegador -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script
+    async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+  </script>
+
+  <!-- Leaflet: mapa real / OpenStreetMap -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    crossorigin="">
+  </script>
+
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --surface-soft: #f1f4f8;
+      --text: #172033;
+      --muted: #5d6678;
+      --line: #dfe4ec;
+      --accent: #1f4b99;
+      --accent-soft: #eaf1ff;
+      --warning-bg: #fff8e7;
+      --warning-line: #ead39a;
+      --max-width: 1120px;
+      --radius: 14px;
+      --shadow: 0 8px 24px rgba(20, 30, 50, 0.07);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height: 1.58;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    .container {
+      width: min(calc(100% - 32px), var(--max-width));
+      margin: 0 auto;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero {
+      padding: 52px 0 40px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.2;
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 850px;
+      margin-bottom: 14px;
+      font-size: clamp(2rem, 5vw, 3.55rem);
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      margin-bottom: 22px;
+      font-size: clamp(1.55rem, 3vw, 2.2rem);
+      letter-spacing: -0.025em;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 1.08rem;
+    }
+
+    p {
+      margin-top: 0;
+    }
+
+    .lead {
+      max-width: 860px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-inner {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      padding: 12px 0;
+      white-space: nowrap;
+    }
+
+    .nav-inner a {
+      color: var(--muted);
+      font-size: 0.93rem;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .nav-inner a:hover {
+      color: var(--accent);
+    }
+
+    main section {
+      padding: 52px 0;
+    }
+
+    main section + section {
+      border-top: 1px solid var(--line);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .symbol {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      margin-bottom: 12px;
+      padding: 4px 10px;
+      background: var(--accent-soft);
+      border-radius: 8px;
+      color: var(--accent);
+      font-size: 1.03rem;
+      font-weight: 700;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .note {
+      padding: 16px 18px;
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-line);
+      border-radius: 10px;
+    }
+
+    .equation {
+      overflow-x: auto;
+      margin: 20px 0;
+      padding: 22px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .equation-label {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-align: right;
+    }
+
+    .definition-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+    }
+
+    .definition-table th,
+    .definition-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .definition-table th {
+      background: var(--surface-soft);
+      font-size: 0.9rem;
+    }
+
+    .definition-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .definition-table td:first-child {
+      min-width: 120px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    #map {
+      min-height: 480px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      background: #e9edf3;
+    }
+
+    .map-caption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .legend {
+      display: grid;
+      gap: 14px;
+    }
+
+    .legend-item {
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .legend-item:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .legend-mark {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 8px;
+      vertical-align: -1px;
+    }
+
+    .circle {
+      border: 3px solid #334155;
+      border-radius: 50%;
+    }
+
+    .square {
+      background: #334155;
+      border-radius: 2px;
+    }
+
+    .line {
+      width: 21px;
+      height: 3px;
+      background: #334155;
+      vertical-align: 3px;
+    }
+
+    .restriction {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .restriction:last-child {
+      margin-bottom: 0;
+    }
+
+    .restriction .equation {
+      margin: 0;
+    }
+
+    .explanation ul {
+      margin: 8px 0 0;
+      padding-left: 1.25rem;
+    }
+
+    .explanation li + li {
+      margin-top: 6px;
+    }
+
+    .mini-example {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: var(--surface-soft);
+      border-radius: 9px;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    footer {
+      padding: 28px 0 44px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 820px) {
+      .grid,
+      .grid-3,
+      .map-layout,
+      .restriction {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 38px;
+      }
+
+      #map {
+        min-height: 390px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container hero">
+      <p class="eyebrow">Material complementar · Semana da Iniciação Científica</p>
+      <h1>Formulação matemática do modelo de localização e alocação de mamógrafos</h1>
+      <p class="lead">
+        Modelo de otimização para projetar uma rede de rastreamento mamográfico
+        considerando simultaneamente capacidade, cobertura da demanda e equidade
+        nos custos de acesso. A equidade é representada pelo Equivalente Igualmente
+        Distribuído de Kolm-Pollak (EDE-KP).
+      </p>
+    </div>
+  </header>
+
+  <nav aria-label="Navegação da página">
+    <div class="container nav-inner">
+      <a href="#leitura-territorial">Leitura territorial</a>
+      <a href="#dados">Dados e instância</a>
+      <a href="#variaveis">Variáveis</a>
+      <a href="#custo-social">Custo social</a>
+      <a href="#ede">EDE de Kolm-Pollak</a>
+      <a href="#objetivo">Função objetivo</a>
+      <a href="#restricoes">Restrições</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="leitura-territorial">
+      <div class="container">
+        <p class="eyebrow">1 · Interpretação espacial</p>
+        <h2>Como o modelo enxerga o território</h2>
+
+        <div class="map-layout">
+          <div>
+            <div id="map" aria-label="Mapa ilustrativo de municípios de Minas Gerais"></div>
+            <p class="map-caption">
+              Exemplo didático sobre um mapa real de Minas Gerais. Os municípios e
+              ligações abaixo servem apenas para interpretar os elementos matemáticos;
+              não representam uma solução nem os valores da instância utilizada no estudo.
+            </p>
+          </div>
+
+          <aside class="card">
+            <h3>Leitura dos elementos</h3>
+            <div class="legend">
+              <div class="legend-item">
+                <span class="legend-mark circle"></span>
+                <strong>Zona de demanda \(i\in I\)</strong>
+                <p class="muted">
+                  Região onde vivem mulheres elegíveis ao rastreamento.
+                  Sua demanda é representada por \(\omega_i\).
+                </p>
+              </div>
+
+              <div class="legend-item">
+                <span class="legend-mark square"></span>
+                <strong>Local candidato \(j\in J\)</strong>
+                <p class="muted">
+                  Ponto onde o modelo pode instalar uma ou mais unidades de mamografia.
+                </p>
+              </div>
+
+              <div class="legend-item">
+                <span class="legend-mark line"></span>
+                <strong>Ligação \(i\rightarrow j\)</strong>
+                <p class="muted">
+                  Deslocamento possível entre uma zona de demanda e um local candidato.
+                  O tempo dessa viagem é \(t_{ij}\).
+                </p>
+              </div>
+
+              <div class="legend-item">
+                <strong>\(x_{ij}\)</strong>
+                <p class="muted">
+                  Fração da demanda de \(i\) encaminhada para \(j\).
+                </p>
+              </div>
+
+              <div class="legend-item">
+                <strong>\(\gamma_i\)</strong>
+                <p class="muted">
+                  Fração da demanda de \(i\) que não recebe atendimento.
+                </p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="dados">
+      <div class="container">
+        <p class="eyebrow">2 · Dados da instância</p>
+        <h2>Conjuntos, parâmetros e funções</h2>
+
+        <h3>Conjuntos</h3>
+        <div class="grid">
+          <article class="card">
+            <div class="symbol">\(I\)</div>
+            <h3>Zonas de demanda</h3>
+            <p>
+              Conjunto das regiões em que existe população elegível ao rastreamento.
+              Cada elemento \(i\in I\) representa uma zona de origem da demanda.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="symbol">\(J\)</div>
+            <h3>Locais candidatos</h3>
+            <p>
+              Conjunto dos locais em que equipamentos podem ser instalados.
+              Cada elemento \(j\in J\) representa uma alternativa de localização.
+            </p>
+          </article>
+        </div>
+
+        <p class="note" style="margin-top:18px;">
+          O modelo-base não exige subconjuntos adicionais. Dependendo da construção da
+          instância, uma mesma unidade territorial pode pertencer simultaneamente a
+          \(I\) e \(J\): ela pode gerar demanda e também ser candidata a receber equipamento.
+        </p>
+
+        <h3 style="margin-top:34px;">Parâmetros</h3>
+        <div class="table-wrap">
+          <table class="definition-table">
+            <thead>
+              <tr>
+                <th>Símbolo</th>
+                <th>Definição matemática</th>
+                <th>Interpretação territorial</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>\(\omega_i\)</td>
+                <td>\(\omega_i&gt;0\)</td>
+                <td>
+                  Número de mulheres elegíveis ao rastreamento na zona \(i\).
+                  Também funciona como peso populacional na avaliação social.
+                </td>
+              </tr>
+              <tr>
+                <td>\(t_{ij}\)</td>
+                <td>tempo de viagem de \(i\) até \(j\)</td>
+                <td>
+                  Custo de acesso associado ao deslocamento da população da zona
+                  \(i\) até o local candidato \(j\).
+                </td>
+              </tr>
+              <tr>
+                <td>\(\pi_i\)</td>
+                <td>penalidade equivalente em tempo</td>
+                <td>
+                  Custo atribuído a uma unidade de demanda da zona \(i\) que permanece
+                  sem rastreamento. Permite comparar não atendimento e deslocamento
+                  em uma mesma escala de custo social.
+                </td>
+              </tr>
+              <tr>
+                <td>\(\Gamma\)</td>
+                <td>capacidade por equipamento</td>
+                <td>
+                  Quantidade máxima de demanda que uma unidade de mamografia consegue
+                  absorver no horizonte de planejamento.
+                </td>
+              </tr>
+              <tr>
+                <td>\(p\)</td>
+                <td>limite de equipamentos disponíveis</td>
+                <td>
+                  Número máximo de unidades que podem compor a rede planejada.
+                </td>
+              </tr>
+              <tr>
+                <td>\(\varepsilon\)</td>
+                <td>\(\varepsilon&gt;0\)</td>
+                <td>
+                  Fator de aversão à desigualdade. Valores maiores fazem o modelo
+                  reagir mais intensamente a zonas que suportam custos de acesso elevados.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="variaveis">
+      <div class="container">
+        <p class="eyebrow">3 · Decisões</p>
+        <h2>Variáveis de decisão</h2>
+
+        <div class="grid-3">
+          <article class="card">
+            <div class="symbol">\(x_{ij}\in[0,1]\)</div>
+            <h3>Alocação da demanda</h3>
+            <p>
+              Fração das mulheres elegíveis da zona \(i\) atendida por equipamentos
+              localizados em \(j\).
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="symbol">\(\gamma_i\in[0,1]\)</div>
+            <h3>Demanda não atendida</h3>
+            <p>
+              Fração das mulheres elegíveis da zona \(i\) que permanece sem rastreamento.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="symbol">\(y_j\in\mathbb{N}\)</div>
+            <h3>Quantidade instalada</h3>
+            <p>
+              Número de unidades de mamografia instaladas no local candidato \(j\).
+              No modelo, \(y_j=0\) significa nenhuma unidade instalada.
+            </p>
+          </article>
+        </div>
+
+        <p class="note" style="margin-top:18px;">
+          Como \(y_j\) conta equipamentos e não apenas a abertura de uma instalação,
+          um mesmo local candidato pode receber mais de uma unidade. Na implementação,
+          o domínio deve admitir zero, isto é, inteiros não negativos.
+        </p>
+      </div>
+    </section>
+
+    <section id="custo-social">
+      <div class="container">
+        <p class="eyebrow">4 · Métrica individual</p>
+        <h2>Custo social de acesso de cada zona</h2>
+
+        <div class="equation">
+          \[
+            C_i =
+            \sum_{j\in J} t_{ij}x_{ij}
+            +
+            \pi_i\gamma_i
+            \qquad \forall i\in I
+          \]
+        </div>
+
+        <div class="grid">
+          <article class="card">
+            <h3>Componente de deslocamento</h3>
+            <p>
+              \(\sum_{j\in J}t_{ij}x_{ij}\) calcula o tempo de viagem médio associado
+              às frações da demanda de \(i\) enviadas aos diferentes locais.
+            </p>
+            <div class="mini-example">
+              Se 60% da demanda viaja 20 min e 40% viaja 50 min,
+              o componente de deslocamento é \(0{,}6(20)+0{,}4(50)=32\) min.
+            </div>
+          </article>
+
+          <article class="card">
+            <h3>Componente de não atendimento</h3>
+            <p>
+              \(\pi_i\gamma_i\) incorpora ao custo da zona a parcela que permanece
+              sem rastreamento, usando uma penalidade expressa em equivalente de tempo.
+            </p>
+            <div class="mini-example">
+              Se \(\pi_i=120\) min e 10% da demanda não é atendida,
+              essa parcela acrescenta \(120(0{,}10)=12\) min ao custo social \(C_i\).
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="ede">
+      <div class="container">
+        <p class="eyebrow">5 · Equidade</p>
+        <h2>Equivalente Igualmente Distribuído de Kolm-Pollak</h2>
+
+        <p>
+          Como \(C_i\) representa um <em>burden</em> — isto é, quanto maior o custo,
+          pior a situação da zona — utiliza-se a forma abaixo para
+          \(\varepsilon&gt;0\):
+        </p>
+
+        <div class="equation">
+          \[
+          EDE_{\varepsilon}(C)=
+          \frac{1}{\varepsilon}
+          \ln\left(
+            \frac{1}{\sum_{i\in I}\omega_i}
+            \sum_{i\in I}
+            \omega_i e^{\varepsilon C_i}
+          \right)
+          \]
+          <div class="equation-label">Equação (1) — EDE de Kolm-Pollak</div>
+        </div>
+
+        <p>
+          O termo exponencial cresce mais rapidamente para valores altos de \(C_i\).
+          Consequentemente, uma redução de custo em uma zona muito desfavorecida
+          produz impacto maior no objetivo do que uma redução de mesma magnitude
+          em uma zona já bem atendida.
+        </p>
+
+        <p>
+          Como \(\varepsilon&gt;0\), \(\sum_i\omega_i\) é constante e o logaritmo é
+          estritamente crescente, minimizar o EDE é equivalente a minimizar apenas
+          a soma exponencial ponderada. Essa transformação elimina termos constantes
+          e preserva exatamente a ordenação das soluções.
+        </p>
+      </div>
+    </section>
+
+    <section id="objetivo">
+      <div class="container">
+        <p class="eyebrow">6 · Otimização</p>
+        <h2>Função objetivo</h2>
+
+        <div class="equation">
+          \[
+          \min\quad
+          F(x,\gamma)
+          =
+          \sum_{i\in I}
+          \omega_i
+          \exp\left[
+            \varepsilon
+            \left(
+              \sum_{j\in J}t_{ij}x_{ij}
+              +
+              \pi_i\gamma_i
+            \right)
+          \right]
+          \]
+          <div class="equation-label">Equação (2) — Função objetivo</div>
+        </div>
+
+        <p>
+          O modelo procura simultaneamente reduzir os custos de acesso e evitar que
+          esses custos se concentrem em poucas zonas muito desfavorecidas. O peso
+          \(\omega_i\) faz com que cada zona contribua de acordo com sua população
+          elegível, enquanto \(\varepsilon\) controla a intensidade da preocupação
+          com a desigualdade.
+        </p>
+      </div>
+    </section>
+
+    <section id="restricoes">
+      <div class="container">
+        <p class="eyebrow">7 · Viabilidade</p>
+        <h2>Restrições e seu papel no sistema</h2>
+
+        <div class="restriction">
+          <div class="equation">
+            \[
+              \sum_{j\in J}x_{ij}+\gamma_i=1
+              \qquad \forall i\in I
+            \]
+            <div class="equation-label">Restrição (3) — Balanço da demanda</div>
+          </div>
+          <article class="card explanation">
+            <h3>Toda a demanda precisa ter um destino contábil</h3>
+            <p>
+              A demanda de cada zona é dividida entre atendimento e não atendimento.
+              Nada pode desaparecer do modelo e nenhuma zona pode alocar mais de 100%
+              de sua população elegível.
+            </p>
+            <ul>
+              <li><strong>Garante:</strong> conservação integral da demanda.</li>
+              <li><strong>Evita:</strong> soluções artificialmente boas que simplesmente ignorem parte das mulheres.</li>
+            </ul>
+            <div class="mini-example">
+              Exemplo: \(x_{iA}=0{,}7\), \(x_{iB}=0{,}2\) implica necessariamente
+              \(\gamma_i=0{,}1\).
+            </div>
+          </article>
+        </div>
+
+        <div class="restriction">
+          <div class="equation">
+            \[
+              \sum_{i\in I}\omega_i x_{ij}
+              \leq
+              \Gamma y_j
+              \qquad \forall j\in J
+            \]
+            <div class="equation-label">Restrição (4) — Capacidade</div>
+          </div>
+          <article class="card explanation">
+            <h3>Um local só pode receber demanda compatível com sua capacidade</h3>
+            <p>
+              O lado esquerdo transforma as frações \(x_{ij}\) em número de mulheres
+              encaminhadas ao local \(j\). O lado direito fornece a capacidade total
+              instalada: capacidade de uma unidade vezes quantidade de unidades.
+            </p>
+            <ul>
+              <li><strong>Garante:</strong> respeito à capacidade operacional.</li>
+              <li><strong>Evita:</strong> concentrar demanda ilimitada em um único município.</li>
+              <li><strong>Também liga localização e alocação:</strong> se \(y_j=0\), então nenhuma demanda pode ser enviada a \(j\).</li>
+            </ul>
+            <div class="mini-example">
+              Se \(\Gamma=5\,000\) exames e \(y_j=2\), o local pode absorver no máximo
+              \(10\,000\) mulheres no horizonte considerado.
+            </div>
+          </article>
+        </div>
+
+        <div class="restriction">
+          <div class="equation">
+            \[
+              \sum_{j\in J}y_j\leq p
+            \]
+            <div class="equation-label">Restrição (5) — Limite de equipamentos</div>
+          </div>
+          <article class="card explanation">
+            <h3>A rede possui um orçamento físico de equipamentos</h3>
+            <p>
+              A soma das unidades instaladas em todos os locais candidatos não pode
+              ultrapassar o total \(p\) disponível para planejamento.
+            </p>
+            <ul>
+              <li><strong>Garante:</strong> compatibilidade com a quantidade de equipamentos disponível.</li>
+              <li><strong>Evita:</strong> que o modelo melhore acesso criando capacidade sem limite.</li>
+            </ul>
+            <div class="mini-example">
+              Se \(p=3\), são possíveis arranjos como três locais com uma unidade cada
+              ou um local com duas unidades e outro com uma.
+            </div>
+          </article>
+        </div>
+
+        <div class="restriction">
+          <div class="equation">
+            \[
+              0\leq x_{ij}\leq1
+              \qquad \forall i\in I,\;j\in J
+            \]
+            <div class="equation-label">Restrição (6) — Domínio de \(x\)</div>
+          </div>
+          <article class="card explanation">
+            <h3>Alocação é expressa como proporção</h3>
+            <p>
+              Cada \(x_{ij}\) representa uma fração, portanto não pode ser negativa
+              nem superar a totalidade da demanda da zona.
+            </p>
+            <div class="mini-example">
+              \(x_{ij}=0{,}25\) significa que 25% da população elegível da zona
+              \(i\) é encaminhada ao local \(j\).
+            </div>
+          </article>
+        </div>
+
+        <div class="restriction">
+          <div class="equation">
+            \[
+              0\leq\gamma_i\leq1
+              \qquad \forall i\in I
+            \]
+            <div class="equation-label">Restrição (7) — Domínio de \(\gamma\)</div>
+          </div>
+          <article class="card explanation">
+            <h3>Não atendimento também é uma proporção</h3>
+            <p>
+              A variável \(\gamma_i\) mede qual parcela da demanda da zona permanece
+              descoberta e, portanto, deve permanecer entre 0 e 1.
+            </p>
+            <div class="mini-example">
+              \(\gamma_i=0\) significa atendimento integral; \(\gamma_i=0{,}08\)
+              significa 8% da demanda não atendida.
+            </div>
+          </article>
+        </div>
+
+        <div class="restriction">
+          <div class="equation">
+            \[
+              y_j\in\mathbb{N}
+              \qquad \forall j\in J
+            \]
+            <div class="equation-label">Restrição (8) — Domínio de \(y\)</div>
+          </div>
+          <article class="card explanation">
+            <h3>Equipamentos são indivisíveis</h3>
+            <p>
+              A quantidade instalada precisa ser inteira: não faz sentido instalar,
+              por exemplo, 1,6 mamógrafo em um local.
+            </p>
+            <ul>
+              <li><strong>Garante:</strong> decisões fisicamente implementáveis.</li>
+              <li><strong>Origina a natureza mista do problema:</strong> \(x\) e \(\gamma\) são contínuas, enquanto \(y\) é inteira.</li>
+            </ul>
+            <div class="mini-example">
+              Valores admissíveis são \(0,1,2,\ldots\), respeitando conjuntamente
+              o limite global \(\sum_j y_j\leq p\).
+            </div>
+          </article>
+        </div>
+
+        <p class="note" style="margin-top:24px;">
+          Em conjunto, essas restrições fazem o modelo decidir <strong>onde instalar
+          equipamentos</strong>, <strong>quanto da demanda enviar a cada local</strong>
+          e <strong>quanto eventualmente permanece sem atendimento</strong>, sempre
+          respeitando capacidade e disponibilidade física da rede.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      Material complementar para divulgação científica. Adapte título, autoria,
+      instituição, referências e os pontos do mapa à versão final do trabalho.
+    </div>
+  </footer>
+
+  <script>
+    // -------------------------------------------------------------------------
+    // MAPA DIDÁTICO
+    // -------------------------------------------------------------------------
+    // Os pontos abaixo usam cidades reais apenas para ilustrar a correspondência
+    // entre I, J, t_ij e x_ij. Troque-os pelos dados reais da sua instância se
+    // quiser transformar esta seção em uma visualização factual do estudo.
+
+    const map = L.map('map', {
+      scrollWheelZoom: false
+    }).setView([-19.65, -44.15], 9);
+
+    L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }
+    ).addTo(map);
+
+    const demandZones = [
+      {
+        name: 'Belo Horizonte',
+        coords: [-19.9167, -43.9345],
+        omega: 'ω₁'
+      },
+      {
+        name: 'Contagem',
+        coords: [-19.9317, -44.0536],
+        omega: 'ω₂'
+      },
+      {
+        name: 'Betim',
+        coords: [-19.9678, -44.1983],
+        omega: 'ω₃'
+      },
+      {
+        name: 'Sabará',
+        coords: [-19.8862, -43.8067],
+        omega: 'ω₄'
+      },
+      {
+        name: 'Nova Lima',
+        coords: [-19.9856, -43.8467],
+        omega: 'ω₅'
+      }
+    ];
+
+    demandZones.forEach((zone, idx) => {
+      L.circleMarker(zone.coords, {
+        radius: 8,
+        weight: 3,
+        fillOpacity: 0.2
+      })
+        .addTo(map)
+        .bindPopup(
+          `<strong>Zona de demanda i${idx + 1}</strong><br>
+           ${zone.name}<br>
+           Demanda elegível: ${zone.omega}`
+        );
+    });
+
+    const candidateLocations = [
+      {
+        name: 'Local candidato j1',
+        coords: [-19.9191, -43.9386]
+      },
+      {
+        name: 'Local candidato j2',
+        coords: [-19.9720, -44.2010]
+      }
+    ];
+
+    const squareIcon = L.divIcon({
+      className: '',
+      html:
+        '<div style="' +
+        'width:16px;height:16px;background:#172033;' +
+        'border:3px solid white;box-shadow:0 0 0 1px #172033;' +
+        'border-radius:2px;"></div>',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
+    });
+
+    candidateLocations.forEach((candidate) => {
+      L.marker(candidate.coords, { icon: squareIcon })
+        .addTo(map)
+        .bindPopup(
+          `<strong>${candidate.name}</strong><br>
+           Possível local de instalação de equipamentos.`
+        );
+    });
+
+    // Algumas conexões ilustrativas i -> j.
+    const illustrativeLinks = [
+      [demandZones[0].coords, candidateLocations[0].coords],
+      [demandZones[1].coords, candidateLocations[0].coords],
+      [demandZones[2].coords, candidateLocations[1].coords],
+      [demandZones[3].coords, candidateLocations[0].coords],
+      [demandZones[4].coords, candidateLocations[0].coords]
+    ];
+
+    illustrativeLinks.forEach((link) => {
+      L.polyline(link, {
+        weight: 2,
+        opacity: 0.55,
+        dashArray: '7 6'
+      }).addTo(map);
+    });
+  </script>
+</body>
+</html>
