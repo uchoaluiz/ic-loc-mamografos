@@ -379,6 +379,10 @@
       gap: 18px;
     }
 
+    .grid-2 > * {
+      min-width: 0;
+    }
+
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -401,6 +405,7 @@
     .equation {
       width: 100%;
       max-width: 100%;
+      min-width: 0;
       overflow-x: auto;
       overflow-y: hidden;
       margin: 16px 0;
@@ -410,11 +415,6 @@
       border-radius: 12px;
       text-align: center;
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior-x: contain;
-    }
-
-    .equation mjx-container {
-      min-width: max-content;
     }
 
     .equation-note {
