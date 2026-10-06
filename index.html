@@ -399,14 +399,24 @@
     }
 
     .equation {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+
       overflow-x: auto;
-      margin: 16px 0;
-      padding: 18px 16px;
-      background: var(--surface-accent);
-      border: 1px solid #d9e4f5;
-      border-radius: 12px;
+      overflow-y: hidden;
+
+      margin: 20px 0;
+      padding: 22px;
+
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       text-align: center;
+
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
     }
 
     .equation-note {
@@ -798,6 +808,13 @@
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+
+    .equation mjx-container[display="true"] {
+      min-width: max-content;
+      width: max-content;
+      margin-left: auto !important;
+      margin-right: auto !important;
     }
   </style>
 </head>
