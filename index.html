@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-ui-lang="pt">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="color-scheme" content="light" />
 
-  <title>Formulação matemática — Rede de mamografia</title>
+  <title>Material complementar — Equidade no planejamento de redes de mamografia</title>
   <meta
     name="description"
-    content="Formulação matemática complementar do modelo de localização e alocação de mamógrafos com equidade baseada no EDE de Kolm-Pollak."
+    content="Material complementar do projeto de Iniciação Científica sobre equidade no planejamento de redes de mamografia em Minas Gerais."
   />
 
-  <!-- MathJax: renderização de LaTeX no navegador -->
   <script>
     window.MathJax = {
       tex: {
@@ -18,160 +19,361 @@
         displayMath: [['\\[', '\\]']],
         processEscapes: true
       },
-      svg: {
-        fontCache: 'global'
-      }
+      svg: { fontCache: 'global' }
     };
   </script>
-  <script
-    async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
-  </script>
-
-  <!-- Leaflet: mapa real / OpenStreetMap -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    crossorigin=""
-  />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    crossorigin="">
-  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
   <style>
     :root {
       --bg: #f7f8fa;
       --surface: #ffffff;
       --surface-soft: #f1f4f8;
+      --surface-accent: #f7faff;
       --text: #172033;
       --muted: #5d6678;
       --line: #dfe4ec;
+      --line-strong: #cbd3df;
       --accent: #1f4b99;
+      --accent-dark: #15366f;
       --accent-soft: #eaf1ff;
+      --good: #1c7359;
+      --good-soft: #eaf7f2;
+      --warning: #8a5b00;
       --warning-bg: #fff8e7;
       --warning-line: #ead39a;
       --max-width: 1120px;
-      --radius: 14px;
-      --shadow: 0 8px 24px rgba(20, 30, 50, 0.07);
+      --radius: 16px;
+      --radius-small: 11px;
+      --shadow: 0 10px 30px rgba(20, 30, 50, 0.07);
+      --shadow-small: 0 5px 18px rgba(20, 30, 50, 0.06);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html {
       scroll-behavior: smooth;
+      scroll-padding-top: 78px;
     }
 
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family:
-        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
         "Segoe UI", sans-serif;
       line-height: 1.58;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
-    a {
-      color: var(--accent);
+    button, input, a { font: inherit; }
+    img { max-width: 100%; }
+    a { color: var(--accent); }
+    a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 3px solid rgba(31, 75, 153, 0.28);
+      outline-offset: 3px;
     }
+
+    .lang-en { display: none !important; }
+    html[data-ui-lang="en"] .lang-pt { display: none !important; }
+    html[data-ui-lang="en"] .lang-en { display: revert !important; }
 
     .container {
       width: min(calc(100% - 32px), var(--max-width));
       margin: 0 auto;
     }
 
-    header {
+    .skip-link {
+      position: fixed;
+      left: 12px;
+      top: -80px;
+      z-index: 5000;
+      padding: 10px 14px;
+      background: var(--text);
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+    .skip-link:focus { top: 12px; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1200;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 58px;
+    }
+
+    .brand {
+      flex: 0 0 auto;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+    }
+
+    .topnav {
+      display: flex;
+      flex: 1 1 auto;
+      gap: 4px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .topnav::-webkit-scrollbar { display: none; }
+
+    .topnav a {
+      flex: 0 0 auto;
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 9px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .topnav a:hover { background: var(--surface-soft); color: var(--text); }
+
+    .language-switch {
+      display: inline-flex;
+      flex: 0 0 auto;
+      gap: 4px;
+      padding: 4px;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    .language-switch button {
+      min-width: 62px;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 9px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 750;
+    }
+
+    .flag-icon {
+      width: 20px;
+      height: 14px;
+      flex: 0 0 auto;
+      display: block;
+      border-radius: 2px;
+      box-shadow: 0 0 0 1px rgba(23, 32, 51, 0.14);
+    }
+    .language-switch button[aria-pressed="true"] {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 5px rgba(20, 30, 50, 0.12);
+    }
+
+    .home {
+      min-height: calc(100svh - 58px);
+      display: flex;
+      align-items: center;
+      padding: clamp(42px, 7vw, 84px) 0;
       background: var(--surface);
       border-bottom: 1px solid var(--line);
     }
 
-    .hero {
-      padding: 52px 0 40px;
+    .home-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+      gap: clamp(34px, 6vw, 70px);
+      align-items: center;
     }
 
     .eyebrow {
-      margin: 0 0 8px;
+      margin: 0 0 9px;
       color: var(--accent);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
+      font-size: 0.79rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
     }
 
-    h1, h2, h3 {
-      line-height: 1.2;
+    h1, h2, h3, h4 {
       margin-top: 0;
+      line-height: 1.17;
+      color: var(--text);
     }
 
     h1 {
-      max-width: 850px;
-      margin-bottom: 14px;
-      font-size: clamp(2rem, 5vw, 3.55rem);
-      letter-spacing: -0.04em;
+      margin-bottom: 18px;
+      font-size: clamp(2.15rem, 5.8vw, 4.25rem);
+      letter-spacing: -0.045em;
+      text-wrap: balance;
     }
 
     h2 {
-      margin-bottom: 22px;
-      font-size: clamp(1.55rem, 3vw, 2.2rem);
-      letter-spacing: -0.025em;
+      margin-bottom: 13px;
+      font-size: clamp(1.65rem, 3.5vw, 2.55rem);
+      letter-spacing: -0.035em;
     }
 
-    h3 {
-      margin-bottom: 8px;
-      font-size: 1.08rem;
-    }
-
-    p {
-      margin-top: 0;
-    }
+    h3 { margin-bottom: 9px; font-size: 1.13rem; }
+    h4 { margin-bottom: 7px; font-size: 1rem; }
+    p { margin-top: 0; }
 
     .lead {
-      max-width: 860px;
-      margin-bottom: 0;
+      max-width: 760px;
+      margin-bottom: 21px;
       color: var(--muted);
-      font-size: 1.08rem;
+      font-size: clamp(1.02rem, 2vw, 1.16rem);
     }
 
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.94);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(10px);
-    }
-
-    .nav-inner {
-      display: flex;
-      gap: 18px;
-      overflow-x: auto;
-      padding: 12px 0;
-      white-space: nowrap;
-    }
-
-    .nav-inner a {
+    .identity {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      background: var(--surface-soft);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 10px 10px 0;
       color: var(--muted);
-      font-size: 0.93rem;
-      font-weight: 650;
+      font-size: 0.94rem;
+    }
+
+    .identity strong { color: var(--text); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .stat {
+      padding: 14px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    .stat-value {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--accent-dark);
+      font-size: 1.24rem;
+      font-weight: 850;
+      letter-spacing: -0.02em;
+    }
+    .stat-label { color: var(--muted); font-size: 0.79rem; line-height: 1.35; }
+
+    .lobby {
+      display: grid;
+      gap: 10px;
+    }
+
+    .lobby-title {
+      margin: 0 0 3px;
+      font-size: 0.83rem;
+      color: var(--muted);
+      font-weight: 750;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .lobby-card {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) 28px;
+      align-items: center;
+      gap: 12px;
+      min-height: 78px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--surface);
+      color: var(--text);
       text-decoration: none;
+      box-shadow: var(--shadow-small);
+      transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .lobby-card:hover {
+      transform: translateY(-2px);
+      border-color: #b9c7df;
+      box-shadow: var(--shadow);
     }
 
-    .nav-inner a:hover {
+    .lobby-number {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      border-radius: 10px;
       color: var(--accent);
+      font-weight: 850;
     }
+
+    .lobby-card strong { display: block; margin-bottom: 2px; font-size: 0.95rem; }
+    .lobby-card span.sub { color: var(--muted); font-size: 0.8rem; line-height: 1.35; }
+    .lobby-arrow { color: var(--accent); font-size: 1.15rem; text-align: center; }
 
     main section {
-      padding: 52px 0;
+      padding: clamp(54px, 8vw, 90px) 0;
+      border-bottom: 1px solid var(--line);
     }
 
-    main section + section {
-      border-top: 1px solid var(--line);
+    .section-intro {
+      max-width: 810px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 1rem;
     }
 
-    .grid {
+    .section-header-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-end;
+      margin-bottom: 28px;
+    }
+
+    .back-home {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .back-home:hover { color: var(--text); border-color: var(--line-strong); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-small);
+    }
+
+    .card-pad { padding: clamp(18px, 3vw, 26px); }
+
+    .grid-2 {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 18px;
@@ -180,845 +382,1482 @@
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
+      gap: 16px;
     }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: var(--shadow);
-    }
-
-    .card p:last-child {
-      margin-bottom: 0;
-    }
-
-    .symbol {
+    .pill {
       display: inline-flex;
       align-items: center;
-      min-height: 34px;
-      margin-bottom: 12px;
-      padding: 4px 10px;
+      gap: 6px;
+      min-height: 28px;
+      padding: 4px 9px;
+      border-radius: 999px;
       background: var(--accent-soft);
-      border-radius: 8px;
-      color: var(--accent);
-      font-size: 1.03rem;
-      font-weight: 700;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .note {
-      padding: 16px 18px;
-      background: var(--warning-bg);
-      border: 1px solid var(--warning-line);
-      border-radius: 10px;
+      color: var(--accent-dark);
+      font-size: 0.77rem;
+      font-weight: 800;
     }
 
     .equation {
       overflow-x: auto;
-      margin: 20px 0;
-      padding: 22px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      margin: 16px 0;
+      padding: 18px 16px;
+      background: var(--surface-accent);
+      border: 1px solid #d9e4f5;
+      border-radius: 12px;
+      text-align: center;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .equation-note {
+      margin: -4px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
       text-align: center;
     }
 
-    .equation-label {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 0.84rem;
-      text-align: right;
+    .note {
+      padding: 15px 17px;
+      border: 1px solid var(--warning-line);
+      border-radius: 11px;
+      background: var(--warning-bg);
+      color: #5f4b1f;
+      font-size: 0.92rem;
     }
 
-    .definition-table {
-      width: 100%;
-      border-collapse: collapse;
-      overflow: hidden;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: var(--radius);
-    }
-
-    .definition-table th,
-    .definition-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-      text-align: left;
-    }
-
-    .definition-table th {
-      background: var(--surface-soft);
-      font-size: 0.9rem;
-    }
-
-    .definition-table tr:last-child td {
-      border-bottom: 0;
-    }
-
-    .definition-table td:first-child {
-      min-width: 120px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .map-layout {
+    .interactive-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
-      gap: 20px;
+      grid-template-columns: minmax(0, 1.22fr) minmax(300px, 0.78fr);
+      gap: 18px;
       align-items: stretch;
     }
 
-    #map {
-      min-height: 480px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      background: #e9edf3;
+    .control-panel {
+      padding: clamp(18px, 3vw, 26px);
     }
 
-    .map-caption {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 0.88rem;
-    }
+    .control-group + .control-group { margin-top: 24px; }
 
-    .legend {
-      display: grid;
+    .control-label-row {
+      display: flex;
+      justify-content: space-between;
       gap: 14px;
+      align-items: baseline;
+      margin-bottom: 9px;
     }
+    .control-label-row strong { font-size: 0.92rem; }
+    .control-value { color: var(--accent); font-size: 0.88rem; font-weight: 800; }
 
-    .legend-item {
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .legend-item:last-child {
-      padding-bottom: 0;
-      border-bottom: 0;
-    }
-
-    .legend-mark {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      margin-right: 8px;
-      vertical-align: -1px;
-    }
-
-    .circle {
-      border: 3px solid #334155;
-      border-radius: 50%;
-    }
-
-    .square {
-      background: #334155;
-      border-radius: 2px;
-    }
-
-    .line {
-      width: 21px;
-      height: 3px;
-      background: #334155;
-      vertical-align: 3px;
-    }
-
-    .restriction {
-      display: grid;
-      grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
-      gap: 18px;
-      align-items: start;
-      margin-bottom: 18px;
-    }
-
-    .restriction:last-child {
-      margin-bottom: 0;
-    }
-
-    .restriction .equation {
+    input[type="range"] {
+      width: 100%;
+      height: 36px;
       margin: 0;
+      accent-color: var(--accent);
+      cursor: pointer;
+      touch-action: pan-y;
     }
 
-    .explanation ul {
-      margin: 8px 0 0;
-      padding-left: 1.25rem;
+    .range-marks {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      margin-top: -2px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-align: center;
     }
 
-    .explanation li + li {
-      margin-top: 6px;
+    .range-marks span:first-child { text-align: left; }
+    .range-marks span:last-child { text-align: right; }
+
+    .burden-chart {
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 22px 18px 16px;
+      border-radius: 14px;
+      background: linear-gradient(to bottom, #ffffff, #f8faff);
+      border: 1px solid var(--line);
     }
 
-    .mini-example {
-      margin-top: 12px;
-      padding: 12px 14px;
+    .bar-area {
+      height: 250px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: clamp(8px, 2vw, 18px);
+      align-items: end;
+      border-bottom: 1px solid var(--line-strong);
+      background-image: linear-gradient(to top, transparent 24%, rgba(223,228,236,.6) 25%, transparent 26%, transparent 49%, rgba(223,228,236,.6) 50%, transparent 51%, transparent 74%, rgba(223,228,236,.6) 75%, transparent 76%);
+    }
+
+    .bar-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      gap: 5px;
+    }
+    .bar-value { font-size: 0.78rem; font-weight: 800; }
+    .burden-bar {
+      width: min(54px, 72%);
+      min-height: 3px;
+      border-radius: 8px 8px 2px 2px;
+      background: var(--accent);
+      transition: height 260ms ease;
+    }
+    .bar-label { margin-top: 7px; color: var(--muted); font-size: 0.75rem; }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 14px;
+    }
+    .metric {
+      padding: 13px 11px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
       background: var(--surface-soft);
-      border-radius: 9px;
-      color: var(--muted);
-      font-size: 0.93rem;
     }
+    .metric small { display: block; margin-bottom: 3px; color: var(--muted); font-size: 0.72rem; }
+    .metric strong { font-size: 1.05rem; }
 
-    footer {
-      padding: 28px 0 44px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
+    .interpretation {
+      margin-top: 14px;
+      padding: 14px 15px;
+      background: var(--good-soft);
+      border: 1px solid #cce8dc;
+      border-radius: 11px;
+      color: #245d4c;
       font-size: 0.9rem;
     }
 
-    @media (max-width: 820px) {
-      .grid,
+    details.model-block {
+      margin-bottom: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      box-shadow: var(--shadow-small);
+      overflow: clip;
+    }
+    details.model-block summary {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 14px 17px;
+      cursor: pointer;
+      font-weight: 800;
+      list-style: none;
+    }
+    details.model-block summary::-webkit-details-marker { display: none; }
+    details.model-block summary::after {
+      content: "+";
+      margin-left: auto;
+      color: var(--accent);
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+    details.model-block[open] summary::after { content: "−"; }
+    details.model-block[open] summary { border-bottom: 1px solid var(--line); }
+    .model-body { padding: 18px; }
+
+    .definition-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .definition {
+      padding: 14px 15px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-soft);
+    }
+    .definition .symbol {
+      display: inline-flex;
+      margin-bottom: 5px;
+      color: var(--accent-dark);
+      font-weight: 850;
+    }
+    .definition p { margin-bottom: 0; color: var(--muted); font-size: 0.9rem; }
+
+    .constraint-list { display: grid; gap: 13px; }
+    .constraint {
+      display: grid;
+      grid-template-columns: minmax(245px, 0.8fr) minmax(0, 1.2fr);
+      gap: 15px;
+      align-items: center;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-soft);
+    }
+    .constraint .equation { margin: 0; background: white; }
+    .constraint p { margin-bottom: 0; color: var(--muted); font-size: 0.9rem; }
+
+    .oa-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(290px, .65fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .oa-chart-card { padding: 14px 14px 8px; overflow: hidden; }
+    #oaSvg { width: 100%; height: auto; display: block; }
+    .oa-side { padding: clamp(18px, 3vw, 24px); }
+    .oa-side .equation { font-size: 0.93rem; }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 9px;
+      margin-bottom: 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .milestone-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .milestone {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      padding: 21px;
+    }
+    .milestone p { color: var(--muted); font-size: 0.91rem; }
+    .milestone .action { margin-top: auto; padding-top: 10px; }
+    .button-link {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      border-radius: 9px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .button-link:hover { background: var(--accent-dark); }
+    .button-link.secondary {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .maps-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .map-card { overflow: hidden; }
+    .map-thumb-button {
+      width: 100%;
+      display: block;
+      padding: 0;
+      border: 0;
+      background: #eef2f6;
+      cursor: zoom-in;
+    }
+    .map-thumb-button img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      display: block;
+      background: white;
+    }
+    .map-meta { padding: 18px; }
+    .map-meta p { color: var(--muted); font-size: 0.9rem; }
+    .map-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    dialog.image-dialog {
+      width: min(96vw, 1500px);
+      height: min(92svh, 980px);
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 30px 90px rgba(15, 22, 36, .25);
+    }
+    dialog.image-dialog::backdrop { background: rgba(15, 22, 36, .62); }
+    .dialog-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 54px;
+      padding: 8px 10px 8px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(8px);
+    }
+    .dialog-toolbar strong { font-size: 0.9rem; }
+    .dialog-controls { display: flex; gap: 6px; }
+    .dialog-controls button {
+      min-width: 42px;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .dialog-scroll {
+      height: calc(100% - 54px);
+      overflow: auto;
+      padding: 14px;
+      background: #f3f5f8;
+      text-align: center;
+      -webkit-overflow-scrolling: touch;
+    }
+    #dialogImage {
+      width: 100%;
+      max-width: none;
+      height: auto;
+      display: inline-block;
+      transition: width 120ms ease;
+      background: white;
+      box-shadow: 0 4px 20px rgba(20, 30, 50, .10);
+    }
+
+    footer {
+      padding: 34px 0 46px;
+      background: white;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-start;
+    }
+    .footer-grid p { max-width: 760px; margin-bottom: 0; }
+
+    @media (max-width: 900px) {
+      .home { align-items: flex-start; min-height: auto; }
+      .home-grid,
+      .interactive-grid,
+      .oa-layout { grid-template-columns: 1fr; }
+      .lobby { max-width: 720px; }
+      .milestone-grid { grid-template-columns: 1fr; }
+      .constraint { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      html { scroll-padding-top: 63px; }
+      .container { width: min(calc(100% - 22px), var(--max-width)); }
+      .topbar-inner { gap: 7px; }
+      .brand { display: none; }
+      .topnav a { padding-inline: 9px; font-size: 0.82rem; }
+      .language-switch button { min-width: 43px; }
+      .home { padding: 38px 0 48px; }
+      h1 { font-size: clamp(2rem, 10vw, 3.2rem); }
+      .stats { grid-template-columns: 1fr; }
+      .stat { display: grid; grid-template-columns: 92px 1fr; align-items: center; gap: 6px; }
+      .stat-value { margin: 0; }
+      main section { padding: 52px 0; }
+      .section-header-row { align-items: flex-start; }
+      .back-home { display: none; }
+      .grid-2,
       .grid-3,
-      .map-layout,
-      .restriction {
-        grid-template-columns: 1fr;
-      }
+      .definition-grid,
+      .maps-grid { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr; }
+      .metric { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+      .metric small { margin: 0; }
+      .bar-area { height: 220px; }
+      dialog.image-dialog { width: 100vw; height: 100svh; max-width: none; max-height: none; border: 0; border-radius: 0; }
+      .footer-grid { display: block; }
+    }
 
-      .hero {
-        padding-top: 38px;
-      }
+    @media (max-width: 430px) {
+      .lobby-card { grid-template-columns: 38px minmax(0, 1fr) 22px; padding: 12px; }
+      .lobby-number { width: 36px; height: 36px; }
+      .control-panel { padding: 17px; }
+      .burden-chart { padding-inline: 10px; }
+      .bar-area { gap: 6px; }
+      .burden-bar { width: min(44px, 74%); }
+      .model-body { padding: 14px; }
+      .constraint { padding: 12px; }
+    }
 
-      #map {
-        min-height: 390px;
-      }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <div class="container hero">
-      <p class="eyebrow">Material complementar · Semana da Iniciação Científica</p>
-      <h1>Formulação matemática do modelo de localização e alocação de mamógrafos</h1>
-      <p class="lead">
-        Modelo de otimização para projetar uma rede de rastreamento mamográfico
-        considerando simultaneamente capacidade, cobertura da demanda e equidade
-        nos custos de acesso. A equidade é representada pelo Equivalente Igualmente
-        Distribuído de Kolm-Pollak (EDE-KP).
-      </p>
+  <a class="skip-link lang-pt" href="#main">Pular para o conteúdo</a>
+  <a class="skip-link lang-en" href="#main">Skip to content</a>
+
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="#home">IC · Mamografia</a>
+      <nav class="topnav" aria-label="Navegação principal">
+        <a href="#home"><span class="lang-pt">Início</span><span class="lang-en">Home</span></a>
+        <a href="#ede"><span class="lang-pt">EDE-KP</span><span class="lang-en">KP-EDE</span></a>
+        <a href="#modelo"><span class="lang-pt">Modelo</span><span class="lang-en">Model</span></a>
+        <a href="#oa">OA</a>
+        <a href="#marcos"><span class="lang-pt">Marcos</span><span class="lang-en">Outputs</span></a>
+        <a href="#mapas"><span class="lang-pt">Mapas</span><span class="lang-en">Maps</span></a>
+      </nav>
+      <div class="language-switch" aria-label="Seleção de idioma">
+        <button id="langPt" type="button" aria-pressed="true" title="Português do Brasil">
+          <svg class="flag-icon" viewBox="0 0 28 20" aria-hidden="true" focusable="false">
+            <rect width="28" height="20" rx="1.5" fill="#009c3b" />
+            <polygon points="14,2.4 25.1,10 14,17.6 2.9,10" fill="#ffdf00" />
+            <circle cx="14" cy="10" r="4.45" fill="#002776" />
+            <path d="M10.2 10.35 Q14 8.55 17.9 10.45" fill="none" stroke="#ffffff" stroke-width="0.75" />
+          </svg>
+          <span>PT</span>
+        </button>
+        <button id="langEn" type="button" aria-pressed="false" title="English">
+          <svg class="flag-icon" viewBox="0 0 28 20" aria-hidden="true" focusable="false">
+            <rect width="28" height="20" rx="1.5" fill="#21468b" />
+            <path d="M0 0 L28 20 M28 0 L0 20" stroke="#ffffff" stroke-width="4.4" />
+            <path d="M0 0 L28 20 M28 0 L0 20" stroke="#cf142b" stroke-width="2.0" />
+            <path d="M14 0 V20 M0 10 H28" stroke="#ffffff" stroke-width="6.0" />
+            <path d="M14 0 V20 M0 10 H28" stroke="#cf142b" stroke-width="3.2" />
+          </svg>
+          <span>EN</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <header id="home" class="home">
+    <div class="container home-grid">
+      <div>
+        <p class="eyebrow lang-pt">Material complementar · Semana do Conhecimento UFMG 2026</p>
+        <p class="eyebrow lang-en">Supplementary material · UFMG Knowledge Week 2026</p>
+
+        <h1 class="lang-pt">Equidade no Planejamento de Redes de Mamografia</h1>
+        <h1 class="lang-en">Equity in Mammography Network Planning</h1>
+
+        <p class="lead lang-pt">
+          Uma extensão interativa do pôster de Iniciação Científica: explore a métrica de equidade,
+          a formulação matemática, a aproximação externa, os marcos científicos e as visualizações
+          espaciais do estudo em Minas Gerais.
+        </p>
+        <p class="lead lang-en">
+          An interactive extension of the undergraduate research poster: explore the equity metric,
+          mathematical formulation, outer approximation, scientific outputs, and spatial visualizations
+          of the Minas Gerais study.
+        </p>
+
+        <div class="identity lang-pt">
+          <strong>Luiz Otávio Uchoa Pereira</strong> · Engenharia de Produção/UFMG · PIBIC/CNPq<br>
+          Orientação: Fátima Machado de Souza Lima · Coorientação: Ricardo Saraiva de Camargo
+        </div>
+        <div class="identity lang-en">
+          <strong>Luiz Otávio Uchoa Pereira</strong> · Industrial Engineering/UFMG · PIBIC/CNPq<br>
+          Advisor: Fátima Machado de Souza Lima · Co-advisor: Ricardo Saraiva de Camargo
+        </div>
+
+        <div class="stats" aria-label="Principais resultados">
+          <div class="stat">
+            <span class="stat-value">35–51% ↓</span>
+            <span class="stat-label lang-pt">EDE-KP médio em relação à p-mediana</span>
+            <span class="stat-label lang-en">mean KP-EDE relative to the p-median</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">&lt; 7% ↑</span>
+            <span class="stat-label lang-pt">aumento médio do custo agregado</span>
+            <span class="stat-label lang-en">mean increase in aggregate cost</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">≈ 1,04%</span>
+            <span class="stat-label lang-pt">gap médio da heurística nos casos com ótimo</span>
+            <span class="stat-label lang-en">mean heuristic gap in cases with an optimum</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lobby" aria-label="Materiais complementares">
+        <p class="lobby-title lang-pt">Escolha o que deseja explorar</p>
+        <p class="lobby-title lang-en">Choose what you want to explore</p>
+
+        <a class="lobby-card" href="#ede">
+          <span class="lobby-number">01</span>
+          <span>
+            <strong class="lang-pt">Entender o EDE de Kolm–Pollak</strong>
+            <strong class="lang-en">Understand the Kolm–Pollak EDE</strong>
+            <span class="sub lang-pt">Teste níveis e distribuições de acesso em cenários fictícios.</span>
+            <span class="sub lang-en">Test access levels and distributions in fictitious scenarios.</span>
+          </span>
+          <span class="lobby-arrow">→</span>
+        </a>
+
+        <a class="lobby-card" href="#modelo">
+          <span class="lobby-number">02</span>
+          <span>
+            <strong class="lang-pt">Ler o modelo matemático</strong>
+            <strong class="lang-en">Read the mathematical model</strong>
+            <span class="sub lang-pt">Conjuntos, parâmetros, variáveis, objetivo e restrições.</span>
+            <span class="sub lang-en">Sets, parameters, variables, objective, and constraints.</span>
+          </span>
+          <span class="lobby-arrow">→</span>
+        </a>
+
+        <a class="lobby-card" href="#oa">
+          <span class="lobby-number">03</span>
+          <span>
+            <strong class="lang-pt">Construir a aproximação externa</strong>
+            <strong class="lang-en">Build the outer approximation</strong>
+            <span class="sub lang-pt">Adicione tangentes e observe a fronteira linear se apertar.</span>
+            <span class="sub lang-en">Add tangents and watch the linear frontier tighten.</span>
+          </span>
+          <span class="lobby-arrow">→</span>
+        </a>
+
+        <a class="lobby-card" href="#marcos">
+          <span class="lobby-number">04</span>
+          <span>
+            <strong class="lang-pt">Acessar os marcos científicos</strong>
+            <strong class="lang-en">Access scientific outputs</strong>
+            <span class="sub lang-pt">Paper, apresentação oral e pôster da pesquisa.</span>
+            <span class="sub lang-en">Paper, oral-presentation slides, and research poster.</span>
+          </span>
+          <span class="lobby-arrow">→</span>
+        </a>
+
+        <a class="lobby-card" href="#mapas">
+          <span class="lobby-number">05</span>
+          <span>
+            <strong class="lang-pt">Explorar os mapas de Minas Gerais</strong>
+            <strong class="lang-en">Explore the Minas Gerais maps</strong>
+            <span class="sub lang-pt">Abra as visualizações em resolução muito maior que a do pôster.</span>
+            <span class="sub lang-en">Open visualizations at much higher resolution than the poster.</span>
+          </span>
+          <span class="lobby-arrow">→</span>
+        </a>
+      </div>
     </div>
   </header>
 
-  <nav aria-label="Navegação da página">
-    <div class="container nav-inner">
-      <a href="#leitura-territorial">Leitura territorial</a>
-      <a href="#dados">Dados e instância</a>
-      <a href="#variaveis">Variáveis</a>
-      <a href="#custo-social">Custo social</a>
-      <a href="#ede">EDE de Kolm-Pollak</a>
-      <a href="#objetivo">Função objetivo</a>
-      <a href="#restricoes">Restrições</a>
-    </div>
-  </nav>
-
-  <main>
-    <section id="leitura-territorial">
-      <div class="container">
-        <p class="eyebrow">1 · Interpretação espacial</p>
-        <h2>Como o modelo enxerga o território</h2>
-
-        <div class="map-layout">
-          <div>
-            <div id="map" aria-label="Mapa ilustrativo de municípios de Minas Gerais"></div>
-            <p class="map-caption">
-              Exemplo didático sobre um mapa real de Minas Gerais. Os municípios e
-              ligações abaixo servem apenas para interpretar os elementos matemáticos;
-              não representam uma solução nem os valores da instância utilizada no estudo.
-            </p>
-          </div>
-
-          <aside class="card">
-            <h3>Leitura dos elementos</h3>
-            <div class="legend">
-              <div class="legend-item">
-                <span class="legend-mark circle"></span>
-                <strong>Zona de demanda \(i\in I\)</strong>
-                <p class="muted">
-                  Região onde vivem mulheres elegíveis ao rastreamento.
-                  Sua demanda é representada por \(\omega_i\).
-                </p>
-              </div>
-
-              <div class="legend-item">
-                <span class="legend-mark square"></span>
-                <strong>Local candidato \(j\in J\)</strong>
-                <p class="muted">
-                  Ponto onde o modelo pode instalar uma ou mais unidades de mamografia.
-                </p>
-              </div>
-
-              <div class="legend-item">
-                <span class="legend-mark line"></span>
-                <strong>Ligação \(i\rightarrow j\)</strong>
-                <p class="muted">
-                  Deslocamento possível entre uma zona de demanda e um local candidato.
-                  O tempo dessa viagem é \(t_{ij}\).
-                </p>
-              </div>
-
-              <div class="legend-item">
-                <strong>\(x_{ij}\)</strong>
-                <p class="muted">
-                  Fração da demanda de \(i\) encaminhada para \(j\).
-                </p>
-              </div>
-
-              <div class="legend-item">
-                <strong>\(\gamma_i\)</strong>
-                <p class="muted">
-                  Fração da demanda de \(i\) que não recebe atendimento.
-                </p>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <section id="dados">
-      <div class="container">
-        <p class="eyebrow">2 · Dados da instância</p>
-        <h2>Conjuntos, parâmetros e funções</h2>
-
-        <h3>Conjuntos</h3>
-        <div class="grid">
-          <article class="card">
-            <div class="symbol">\(I\)</div>
-            <h3>Zonas de demanda</h3>
-            <p>
-              Conjunto das regiões em que existe população elegível ao rastreamento.
-              Cada elemento \(i\in I\) representa uma zona de origem da demanda.
-            </p>
-          </article>
-
-          <article class="card">
-            <div class="symbol">\(J\)</div>
-            <h3>Locais candidatos</h3>
-            <p>
-              Conjunto dos locais em que equipamentos podem ser instalados.
-              Cada elemento \(j\in J\) representa uma alternativa de localização.
-            </p>
-          </article>
-        </div>
-
-        <p class="note" style="margin-top:18px;">
-          O modelo-base não exige subconjuntos adicionais. Dependendo da construção da
-          instância, uma mesma unidade territorial pode pertencer simultaneamente a
-          \(I\) e \(J\): ela pode gerar demanda e também ser candidata a receber equipamento.
-        </p>
-
-        <h3 style="margin-top:34px;">Parâmetros</h3>
-        <div class="table-wrap">
-          <table class="definition-table">
-            <thead>
-              <tr>
-                <th>Símbolo</th>
-                <th>Definição matemática</th>
-                <th>Interpretação territorial</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>\(\omega_i\)</td>
-                <td>\(\omega_i&gt;0\)</td>
-                <td>
-                  Número de mulheres elegíveis ao rastreamento na zona \(i\).
-                  Também funciona como peso populacional na avaliação social.
-                </td>
-              </tr>
-              <tr>
-                <td>\(t_{ij}\)</td>
-                <td>tempo de viagem de \(i\) até \(j\)</td>
-                <td>
-                  Custo de acesso associado ao deslocamento da população da zona
-                  \(i\) até o local candidato \(j\).
-                </td>
-              </tr>
-              <tr>
-                <td>\(\pi_i\)</td>
-                <td>penalidade equivalente em tempo</td>
-                <td>
-                  Custo atribuído a uma unidade de demanda da zona \(i\) que permanece
-                  sem rastreamento. Permite comparar não atendimento e deslocamento
-                  em uma mesma escala de custo social.
-                </td>
-              </tr>
-              <tr>
-                <td>\(\Gamma\)</td>
-                <td>capacidade por equipamento</td>
-                <td>
-                  Quantidade máxima de demanda que uma unidade de mamografia consegue
-                  absorver no horizonte de planejamento.
-                </td>
-              </tr>
-              <tr>
-                <td>\(p\)</td>
-                <td>limite de equipamentos disponíveis</td>
-                <td>
-                  Número máximo de unidades que podem compor a rede planejada.
-                </td>
-              </tr>
-              <tr>
-                <td>\(\varepsilon\)</td>
-                <td>\(\varepsilon&gt;0\)</td>
-                <td>
-                  Fator de aversão à desigualdade. Valores maiores fazem o modelo
-                  reagir mais intensamente a zonas que suportam custos de acesso elevados.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section id="variaveis">
-      <div class="container">
-        <p class="eyebrow">3 · Decisões</p>
-        <h2>Variáveis de decisão</h2>
-
-        <div class="grid-3">
-          <article class="card">
-            <div class="symbol">\(x_{ij}\in[0,1]\)</div>
-            <h3>Alocação da demanda</h3>
-            <p>
-              Fração das mulheres elegíveis da zona \(i\) atendida por equipamentos
-              localizados em \(j\).
-            </p>
-          </article>
-
-          <article class="card">
-            <div class="symbol">\(\gamma_i\in[0,1]\)</div>
-            <h3>Demanda não atendida</h3>
-            <p>
-              Fração das mulheres elegíveis da zona \(i\) que permanece sem rastreamento.
-            </p>
-          </article>
-
-          <article class="card">
-            <div class="symbol">\(y_j\in\mathbb{N}\)</div>
-            <h3>Quantidade instalada</h3>
-            <p>
-              Número de unidades de mamografia instaladas no local candidato \(j\).
-              No modelo, \(y_j=0\) significa nenhuma unidade instalada.
-            </p>
-          </article>
-        </div>
-
-        <p class="note" style="margin-top:18px;">
-          Como \(y_j\) conta equipamentos e não apenas a abertura de uma instalação,
-          um mesmo local candidato pode receber mais de uma unidade. Na implementação,
-          o domínio deve admitir zero, isto é, inteiros não negativos.
-        </p>
-      </div>
-    </section>
-
-    <section id="custo-social">
-      <div class="container">
-        <p class="eyebrow">4 · Métrica individual</p>
-        <h2>Custo social de acesso de cada zona</h2>
-
-        <div class="equation">
-          \[
-            C_i =
-            \sum_{j\in J} t_{ij}x_{ij}
-            +
-            \pi_i\gamma_i
-            \qquad \forall i\in I
-          \]
-        </div>
-
-        <div class="grid">
-          <article class="card">
-            <h3>Componente de deslocamento</h3>
-            <p>
-              \(\sum_{j\in J}t_{ij}x_{ij}\) calcula o tempo de viagem médio associado
-              às frações da demanda de \(i\) enviadas aos diferentes locais.
-            </p>
-            <div class="mini-example">
-              Se 60% da demanda viaja 20 min e 40% viaja 50 min,
-              o componente de deslocamento é \(0{,}6(20)+0{,}4(50)=32\) min.
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Componente de não atendimento</h3>
-            <p>
-              \(\pi_i\gamma_i\) incorpora ao custo da zona a parcela que permanece
-              sem rastreamento, usando uma penalidade expressa em equivalente de tempo.
-            </p>
-            <div class="mini-example">
-              Se \(\pi_i=120\) min e 10% da demanda não é atendida,
-              essa parcela acrescenta \(120(0{,}10)=12\) min ao custo social \(C_i\).
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
+  <main id="main">
     <section id="ede">
       <div class="container">
-        <p class="eyebrow">5 · Equidade</p>
-        <h2>Equivalente Igualmente Distribuído de Kolm-Pollak</h2>
+        <div class="section-header-row">
+          <div>
+            <p class="eyebrow lang-pt">01 · Métrica de equidade</p>
+            <p class="eyebrow lang-en">01 · Equity metric</p>
+            <h2 class="lang-pt">O que o EDE de Kolm–Pollak realmente enxerga?</h2>
+            <h2 class="lang-en">What does the Kolm–Pollak EDE actually see?</h2>
+          </div>
+          <a class="back-home" href="#home"><span class="lang-pt">↑ Voltar ao início</span><span class="lang-en">↑ Back to home</span></a>
+        </div>
 
-        <p>
-          Como \(C_i\) representa um <em>burden</em> — isto é, quanto maior o custo,
-          pior a situação da zona — utiliza-se a forma abaixo para
-          \(\varepsilon&gt;0\):
+        <p class="section-intro lang-pt">
+          O EDE transforma uma distribuição desigual de <em>burdens</em> de acesso em um custo uniforme equivalente.
+          Nesta demonstração, as cinco regiões fictícias têm o mesmo peso populacional. Compare cenários com a mesma
+          média e desigualdades diferentes — e depois altere o próprio nível dos custos.
+        </p>
+        <p class="section-intro lang-en">
+          The EDE transforms an unequal distribution of access burdens into an equivalent uniform burden.
+          In this demonstration, the five fictitious regions have the same population weight. Compare scenarios with
+          the same mean and different inequalities — then change the overall burden level itself.
         </p>
 
         <div class="equation">
           \[
-          EDE_{\varepsilon}(C)=
-          \frac{1}{\varepsilon}
-          \ln\left(
-            \frac{1}{\sum_{i\in I}\omega_i}
-            \sum_{i\in I}
-            \omega_i e^{\varepsilon C_i}
-          \right)
+          EDE^{KP}_{\varepsilon}(C)=
+          \frac{1}{\varepsilon}\cdot\ln\left(
+          \frac{1}{\sum_{i\in I}\omega_i}\cdot
+          \sum_{i\in I}\omega_i\cdot e^{\varepsilon\cdot C_i}
+          \right),\qquad \varepsilon>0
           \]
-          <div class="equation-label">Equação (1) — EDE de Kolm-Pollak</div>
+        </div>
+        <p class="equation-note lang-pt">Quanto maior \(\varepsilon\), maior a aversão à iniquidade e a ênfase nos maiores custos.</p>
+        <p class="equation-note lang-en">The larger \(\varepsilon\), the stronger the inequality aversion and the emphasis on high burdens.</p>
+
+        <div class="interactive-grid" style="margin-top:24px;">
+          <div class="card control-panel">
+            <div class="control-group">
+              <div class="control-label-row">
+                <strong class="lang-pt">Cenário de acesso</strong>
+                <strong class="lang-en">Access scenario</strong>
+                <span id="scenarioValue" class="control-value">2 / 6</span>
+              </div>
+              <input id="scenarioSlider" type="range" min="0" max="5" step="1" value="1" aria-label="Cenário de acesso" />
+              <div class="range-marks" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+              <h3 id="scenarioTitle" style="margin-top:13px; margin-bottom:5px;"></h3>
+              <p id="scenarioDescription" class="section-intro" style="margin-bottom:0; font-size:.91rem;"></p>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label-row">
+                <strong class="lang-pt">Aversão à iniquidade</strong>
+                <strong class="lang-en">Inequality aversion</strong>
+                <span id="epsilonValue" class="control-value">ε = 0,06</span>
+              </div>
+              <input id="epsilonSlider" type="range" min="0" max="5" step="1" value="3" aria-label="Aversão à iniquidade" />
+              <div class="range-marks" aria-hidden="true"><span>0</span><span>.02</span><span>.04</span><span>.06</span><span>.08</span><span>.12</span></div>
+            </div>
+
+            <div class="metrics">
+              <div class="metric">
+                <small class="lang-pt">Média</small><small class="lang-en">Mean</small>
+                <strong id="meanMetric">13,0 min</strong>
+              </div>
+              <div class="metric">
+                <small>EDE-KP</small>
+                <strong id="edeMetric">13,0 min</strong>
+              </div>
+              <div class="metric">
+                <small class="lang-pt">Diferença EDE − média</small><small class="lang-en">EDE − mean difference</small>
+                <strong id="gapMetric">0,0 min</strong>
+              </div>
+            </div>
+
+            <div id="edeInterpretation" class="interpretation"></div>
+          </div>
+
+          <div class="burden-chart" aria-label="Custos de acesso nas cinco regiões fictícias">
+            <div id="barArea" class="bar-area"></div>
+          </div>
         </div>
 
-        <p>
-          O termo exponencial cresce mais rapidamente para valores altos de \(C_i\).
-          Consequentemente, uma redução de custo em uma zona muito desfavorecida
-          produz impacto maior no objetivo do que uma redução de mesma magnitude
-          em uma zona já bem atendida.
-        </p>
-
-        <p>
-          Como \(\varepsilon&gt;0\), \(\sum_i\omega_i\) é constante e o logaritmo é
-          estritamente crescente, minimizar o EDE é equivalente a minimizar apenas
-          a soma exponencial ponderada. Essa transformação elimina termos constantes
-          e preserva exatamente a ordenação das soluções.
-        </p>
+        <div class="grid-2" style="margin-top:18px;">
+          <div class="card card-pad">
+            <span class="pill lang-pt">Efeito do nível</span><span class="pill lang-en">Level effect</span>
+            <h3 style="margin-top:12px;" class="lang-pt">Mesma desigualdade, custos maiores</h3>
+            <h3 style="margin-top:12px;" class="lang-en">Same inequality, higher burdens</h3>
+            <p class="lang-pt" style="margin-bottom:0; color:var(--muted);">
+              Compare os cenários 1 e 2: ambos são perfeitamente igualitários. Ao elevar todos os custos de 8 para 13 minutos,
+              o EDE também sobe de 8 para 13. A métrica não mede apenas dispersão.
+            </p>
+            <p class="lang-en" style="margin-bottom:0; color:var(--muted);">
+              Compare scenarios 1 and 2: both are perfectly equal. Raising every burden from 8 to 13 minutes also raises the EDE
+              from 8 to 13. The metric is not merely a dispersion measure.
+            </p>
+          </div>
+          <div class="card card-pad">
+            <span class="pill lang-pt">Efeito da distribuição</span><span class="pill lang-en">Distribution effect</span>
+            <h3 style="margin-top:12px;" class="lang-pt">Mesma média, desigualdade maior</h3>
+            <h3 style="margin-top:12px;" class="lang-en">Same mean, greater inequality</h3>
+            <p class="lang-pt" style="margin-bottom:0; color:var(--muted);">
+              Compare os cenários 2 a 5: a média permanece em 13 minutos, mas a concentração do burden em poucas regiões faz o EDE crescer.
+              Quanto maior \(\varepsilon\), mais forte é esse efeito.
+            </p>
+            <p class="lang-en" style="margin-bottom:0; color:var(--muted);">
+              Compare scenarios 2 through 5: the mean remains 13 minutes, but concentrating burden in a few regions increases the EDE.
+              The larger \(\varepsilon\), the stronger this effect becomes.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="objetivo">
+    <section id="modelo">
       <div class="container">
-        <p class="eyebrow">6 · Otimização</p>
-        <h2>Função objetivo</h2>
-
-        <div class="equation">
-          \[
-          \min\quad
-          F(x,\gamma)
-          =
-          \sum_{i\in I}
-          \omega_i
-          \exp\left[
-            \varepsilon
-            \left(
-              \sum_{j\in J}t_{ij}x_{ij}
-              +
-              \pi_i\gamma_i
-            \right)
-          \right]
-          \]
-          <div class="equation-label">Equação (2) — Função objetivo</div>
+        <div class="section-header-row">
+          <div>
+            <p class="eyebrow lang-pt">02 · Formulação matemática</p>
+            <p class="eyebrow lang-en">02 · Mathematical formulation</p>
+            <h2 class="lang-pt">Do custo de acesso à decisão de localização–alocação</h2>
+            <h2 class="lang-en">From access burden to location–allocation decisions</h2>
+          </div>
+          <a class="back-home" href="#home"><span class="lang-pt">↑ Voltar ao início</span><span class="lang-en">↑ Back to home</span></a>
         </div>
 
-        <p>
-          O modelo procura simultaneamente reduzir os custos de acesso e evitar que
-          esses custos se concentrem em poucas zonas muito desfavorecidas. O peso
-          \(\omega_i\) faz com que cada zona contribua de acordo com sua população
-          elegível, enquanto \(\varepsilon\) controla a intensidade da preocupação
-          com a desigualdade.
+        <p class="section-intro lang-pt">
+          Para cada população \(i\), o modelo combina deslocamento e não atendimento em um único burden \(C_i\).
+          A rede é então planejada para minimizar o EDE-KP desses custos, respeitando capacidade e disponibilidade de equipamentos.
         </p>
+        <p class="section-intro lang-en">
+          For each population \(i\), the model combines travel and unscreened demand into a single burden \(C_i\).
+          The network is then planned to minimize the KP-EDE of these burdens while respecting capacity and equipment availability.
+        </p>
+
+        <details class="model-block" open>
+          <summary><span class="lang-pt">EDE-KP, custo social e função objetivo equivalente</span><span class="lang-en">KP-EDE, social access cost, and equivalent objective</span></summary>
+          <div class="model-body">
+            <div class="grid-2">
+              <div>
+                <h3 class="lang-pt">Custo social de acesso</h3>
+                <h3 class="lang-en">Social access burden</h3>
+                <div class="equation">
+                  \[
+                  C_i=\sum_{j\in J}t_{ij}\cdot x_{ij}+\pi_i\cdot\gamma_i
+                  \qquad \forall i\in I
+                  \]
+                </div>
+                <p class="lang-pt" style="color:var(--muted); margin-bottom:0;">
+                  O primeiro termo representa o deslocamento; o segundo atribui uma penalização equivalente em tempo à parcela não atendida.
+                </p>
+                <p class="lang-en" style="color:var(--muted); margin-bottom:0;">
+                  The first term represents travel; the second assigns a time-equivalent penalty to the unscreened share.
+                </p>
+              </div>
+              <div>
+                <h3 class="lang-pt">EDE-KP original</h3>
+                <h3 class="lang-en">Original KP-EDE</h3>
+                <div class="equation">
+                  \[
+                  EDE^{KP}_{\varepsilon}(C)=
+                  \frac{1}{\varepsilon}\cdot\ln\left(
+                  \frac{1}{\sum_{i\in I}\omega_i}\cdot
+                  \sum_{i\in I}\omega_i\cdot e^{\varepsilon\cdot C_i}
+                  \right)
+                  \]
+                </div>
+              </div>
+            </div>
+
+            <div class="note" style="margin-top:18px;">
+              <span class="lang-pt">
+                Como \(\varepsilon>0\), \(\sum_i\omega_i\) é constante e \(\ln(\cdot)\) é estritamente crescente,
+                minimizar o EDE-KP é exatamente equivalente a minimizar apenas a soma exponencial ponderada.
+              </span>
+              <span class="lang-en">
+                Because \(\varepsilon>0\), \(\sum_i\omega_i\) is constant and \(\ln(\cdot)\) is strictly increasing,
+                minimizing the KP-EDE is exactly equivalent to minimizing only the weighted exponential sum.
+              </span>
+            </div>
+
+            <div class="equation" style="margin-top:18px;">
+              \[
+              \begin{gathered}
+              \min\;EDE^{KP}_{\varepsilon}(C)
+              \quad\Longleftrightarrow\quad
+              \min\;\sum_{i\in I}\omega_i\cdot e^{\varepsilon\cdot C_i}
+              \\[0.85em]
+              C_i=\sum_{j\in J}t_{ij}\cdot x_{ij}+\pi_i\cdot\gamma_i
+              \\[-0.05em]
+              \Downarrow
+              \\[-0.05em]
+              \boxed{
+              \min\;\sum_{i\in I}\omega_i\cdot
+              e^{\varepsilon\cdot\left(\sum_{j\in J}t_{ij}\cdot x_{ij}+\pi_i\cdot\gamma_i\right)}
+              }
+              \end{gathered}
+              \]
+            </div>
+          </div>
+        </details>
+
+        <details class="model-block">
+          <summary><span class="lang-pt">Conjuntos e parâmetros</span><span class="lang-en">Sets and parameters</span></summary>
+          <div class="model-body">
+            <div class="definition-grid">
+              <div class="definition"><span class="symbol">\(I\)</span><p class="lang-pt">Conjunto das zonas de demanda.</p><p class="lang-en">Set of demand zones.</p></div>
+              <div class="definition"><span class="symbol">\(J\)</span><p class="lang-pt">Conjunto dos locais candidatos à instalação.</p><p class="lang-en">Set of candidate installation locations.</p></div>
+              <div class="definition"><span class="symbol">\(\omega_i\)</span><p class="lang-pt">Demanda elegível na zona \(i\) e peso populacional no EDE.</p><p class="lang-en">Eligible demand in zone \(i\) and population weight in the EDE.</p></div>
+              <div class="definition"><span class="symbol">\(t_{ij}\)</span><p class="lang-pt">Tempo/custo de viagem de \(i\) até \(j\).</p><p class="lang-en">Travel time/cost from \(i\) to \(j\).</p></div>
+              <div class="definition"><span class="symbol">\(\pi_i\)</span><p class="lang-pt">Penalização equivalente atribuída ao não atendimento em \(i\).</p><p class="lang-en">Equivalent penalty assigned to unscreened demand in \(i\).</p></div>
+              <div class="definition"><span class="symbol">\(\Gamma\)</span><p class="lang-pt">Capacidade de atendimento por equipamento.</p><p class="lang-en">Screening capacity per equipment unit.</p></div>
+              <div class="definition"><span class="symbol">\(p\)</span><p class="lang-pt">Número máximo de equipamentos disponíveis.</p><p class="lang-en">Maximum number of available equipment units.</p></div>
+              <div class="definition"><span class="symbol">\(\varepsilon>0\)</span><p class="lang-pt">Parâmetro de aversão à iniquidade.</p><p class="lang-en">Inequality-aversion parameter.</p></div>
+            </div>
+          </div>
+        </details>
+
+        <details class="model-block">
+          <summary><span class="lang-pt">Variáveis de decisão</span><span class="lang-en">Decision variables</span></summary>
+          <div class="model-body">
+            <div class="grid-3">
+              <div class="definition">
+                <span class="symbol">\(x_{ij}\in[0,1]\)</span>
+                <h4 class="lang-pt">Alocação da demanda</h4><h4 class="lang-en">Demand allocation</h4>
+                <p class="lang-pt">Fração da demanda de \(i\) atendida em \(j\).</p><p class="lang-en">Share of demand from \(i\) served at \(j\).</p>
+              </div>
+              <div class="definition">
+                <span class="symbol">\(\gamma_i\in[0,1]\)</span>
+                <h4 class="lang-pt">Não atendimento</h4><h4 class="lang-en">Unscreened demand</h4>
+                <p class="lang-pt">Fração da demanda de \(i\) que permanece sem atendimento.</p><p class="lang-en">Share of demand from \(i\) that remains unscreened.</p>
+              </div>
+              <div class="definition">
+                <span class="symbol">\(y_j\in\mathbb{Z}_{\ge 0}\)</span>
+                <h4 class="lang-pt">Equipamentos instalados</h4><h4 class="lang-en">Installed equipment</h4>
+                <p class="lang-pt">Quantidade de unidades instaladas no local candidato \(j\).</p><p class="lang-en">Number of equipment units installed at candidate location \(j\).</p>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="model-block">
+          <summary><span class="lang-pt">Restrições e interpretação</span><span class="lang-en">Constraints and interpretation</span></summary>
+          <div class="model-body">
+            <div class="constraint-list">
+              <div class="constraint">
+                <div class="equation">\[\sum_{j\in J}x_{ij}+\gamma_i=1\qquad\forall i\in I\]</div>
+                <p class="lang-pt"><strong>Balanço da demanda.</strong> Toda parcela da população é contabilizada como atendida em algum local ou não atendida.</p>
+                <p class="lang-en"><strong>Demand balance.</strong> Every population share is accounted for as either served somewhere or unscreened.</p>
+              </div>
+              <div class="constraint">
+                <div class="equation">\[\sum_{i\in I}\omega_i\cdot x_{ij}\leq \Gamma\cdot y_j\qquad\forall j\in J\]</div>
+                <p class="lang-pt"><strong>Capacidade.</strong> A demanda enviada a \(j\) não pode superar a capacidade instalada. Se \(y_j=0\), nenhuma demanda pode ser alocada ao local.</p>
+                <p class="lang-en"><strong>Capacity.</strong> Demand assigned to \(j\) cannot exceed installed capacity. If \(y_j=0\), no demand can be allocated there.</p>
+              </div>
+              <div class="constraint">
+                <div class="equation">\[\sum_{j\in J}y_j\leq p\]</div>
+                <p class="lang-pt"><strong>Disponibilidade física.</strong> A rede não pode utilizar mais equipamentos do que o total disponível para o planejamento.</p>
+                <p class="lang-en"><strong>Physical availability.</strong> The network cannot use more equipment units than are available for planning.</p>
+              </div>
+              <div class="constraint">
+                <div class="equation">\[x_{ij},\gamma_i\in[0,1],\qquad y_j\in\mathbb{Z}_{\ge0}\]</div>
+                <p class="lang-pt"><strong>Domínios.</strong> Alocação e não atendimento são proporções; equipamentos são unidades inteiras não negativas.</p>
+                <p class="lang-en"><strong>Domains.</strong> Allocation and unscreened demand are shares; equipment is counted in nonnegative integer units.</p>
+              </div>
+            </div>
+          </div>
+        </details>
       </div>
     </section>
 
-    <section id="restricoes">
+    <section id="oa">
       <div class="container">
-        <p class="eyebrow">7 · Viabilidade</p>
-        <h2>Restrições e seu papel no sistema</h2>
-
-        <div class="restriction">
-          <div class="equation">
-            \[
-              \sum_{j\in J}x_{ij}+\gamma_i=1
-              \qquad \forall i\in I
-            \]
-            <div class="equation-label">Restrição (3) — Balanço da demanda</div>
+        <div class="section-header-row">
+          <div>
+            <p class="eyebrow lang-pt">03 · Aproximação Externa</p>
+            <p class="eyebrow lang-en">03 · Outer Approximation</p>
+            <h2 class="lang-pt">Construa a fronteira linear, tangente por tangente</h2>
+            <h2 class="lang-en">Build the linear frontier, one tangent at a time</h2>
           </div>
-          <article class="card explanation">
-            <h3>Toda a demanda precisa ter um destino contábil</h3>
-            <p>
-              A demanda de cada zona é dividida entre atendimento e não atendimento.
-              Nada pode desaparecer do modelo e nenhuma zona pode alocar mais de 100%
-              de sua população elegível.
-            </p>
-            <ul>
-              <li><strong>Garante:</strong> conservação integral da demanda.</li>
-              <li><strong>Evita:</strong> soluções artificialmente boas que simplesmente ignorem parte das mulheres.</li>
-            </ul>
-            <div class="mini-example">
-              Exemplo: \(x_{iA}=0{,}7\), \(x_{iB}=0{,}2\) implica necessariamente
-              \(\gamma_i=0{,}1\).
-            </div>
-          </article>
+          <a class="back-home" href="#home"><span class="lang-pt">↑ Voltar ao início</span><span class="lang-en">↑ Back to home</span></a>
         </div>
 
-        <div class="restriction">
-          <div class="equation">
-            \[
-              \sum_{i\in I}\omega_i x_{ij}
-              \leq
-              \Gamma y_j
-              \qquad \forall j\in J
-            \]
-            <div class="equation-label">Restrição (4) — Capacidade</div>
-          </div>
-          <article class="card explanation">
-            <h3>Um local só pode receber demanda compatível com sua capacidade</h3>
-            <p>
-              O lado esquerdo transforma as frações \(x_{ij}\) em número de mulheres
-              encaminhadas ao local \(j\). O lado direito fornece a capacidade total
-              instalada: capacidade de uma unidade vezes quantidade de unidades.
-            </p>
-            <ul>
-              <li><strong>Garante:</strong> respeito à capacidade operacional.</li>
-              <li><strong>Evita:</strong> concentrar demanda ilimitada em um único município.</li>
-              <li><strong>Também liga localização e alocação:</strong> se \(y_j=0\), então nenhuma demanda pode ser enviada a \(j\).</li>
-            </ul>
-            <div class="mini-example">
-              Se \(\Gamma=5\,000\) exames e \(y_j=2\), o local pode absorver no máximo
-              \(10\,000\) mulheres no horizonte considerado.
-            </div>
-          </article>
-        </div>
-
-        <div class="restriction">
-          <div class="equation">
-            \[
-              \sum_{j\in J}y_j\leq p
-            \]
-            <div class="equation-label">Restrição (5) — Limite de equipamentos</div>
-          </div>
-          <article class="card explanation">
-            <h3>A rede possui um orçamento físico de equipamentos</h3>
-            <p>
-              A soma das unidades instaladas em todos os locais candidatos não pode
-              ultrapassar o total \(p\) disponível para planejamento.
-            </p>
-            <ul>
-              <li><strong>Garante:</strong> compatibilidade com a quantidade de equipamentos disponível.</li>
-              <li><strong>Evita:</strong> que o modelo melhore acesso criando capacidade sem limite.</li>
-            </ul>
-            <div class="mini-example">
-              Se \(p=3\), são possíveis arranjos como três locais com uma unidade cada
-              ou um local com duas unidades e outro com uma.
-            </div>
-          </article>
-        </div>
-
-        <div class="restriction">
-          <div class="equation">
-            \[
-              0\leq x_{ij}\leq1
-              \qquad \forall i\in I,\;j\in J
-            \]
-            <div class="equation-label">Restrição (6) — Domínio de \(x\)</div>
-          </div>
-          <article class="card explanation">
-            <h3>Alocação é expressa como proporção</h3>
-            <p>
-              Cada \(x_{ij}\) representa uma fração, portanto não pode ser negativa
-              nem superar a totalidade da demanda da zona.
-            </p>
-            <div class="mini-example">
-              \(x_{ij}=0{,}25\) significa que 25% da população elegível da zona
-              \(i\) é encaminhada ao local \(j\).
-            </div>
-          </article>
-        </div>
-
-        <div class="restriction">
-          <div class="equation">
-            \[
-              0\leq\gamma_i\leq1
-              \qquad \forall i\in I
-            \]
-            <div class="equation-label">Restrição (7) — Domínio de \(\gamma\)</div>
-          </div>
-          <article class="card explanation">
-            <h3>Não atendimento também é uma proporção</h3>
-            <p>
-              A variável \(\gamma_i\) mede qual parcela da demanda da zona permanece
-              descoberta e, portanto, deve permanecer entre 0 e 1.
-            </p>
-            <div class="mini-example">
-              \(\gamma_i=0\) significa atendimento integral; \(\gamma_i=0{,}08\)
-              significa 8% da demanda não atendida.
-            </div>
-          </article>
-        </div>
-
-        <div class="restriction">
-          <div class="equation">
-            \[
-              y_j\in\mathbb{N}
-              \qquad \forall j\in J
-            \]
-            <div class="equation-label">Restrição (8) — Domínio de \(y\)</div>
-          </div>
-          <article class="card explanation">
-            <h3>Equipamentos são indivisíveis</h3>
-            <p>
-              A quantidade instalada precisa ser inteira: não faz sentido instalar,
-              por exemplo, 1,6 mamógrafo em um local.
-            </p>
-            <ul>
-              <li><strong>Garante:</strong> decisões fisicamente implementáveis.</li>
-              <li><strong>Origina a natureza mista do problema:</strong> \(x\) e \(\gamma\) são contínuas, enquanto \(y\) é inteira.</li>
-            </ul>
-            <div class="mini-example">
-              Valores admissíveis são \(0,1,2,\ldots\), respeitando conjuntamente
-              o limite global \(\sum_j y_j\leq p\).
-            </div>
-          </article>
-        </div>
-
-        <p class="note" style="margin-top:24px;">
-          Em conjunto, essas restrições fazem o modelo decidir <strong>onde instalar
-          equipamentos</strong>, <strong>quanto da demanda enviar a cada local</strong>
-          e <strong>quanto eventualmente permanece sem atendimento</strong>, sempre
-          respeitando capacidade e disponibilidade física da rede.
+        <p class="section-intro lang-pt">
+          Como \(e^{\varepsilon\cdot C}\) é convexa, cada reta tangente é um subestimador global.
+          A aproximação externa usa o máximo dessas tangentes como uma fronteira linear por partes abaixo da curva exponencial.
+          Mova a barra: cada marco adiciona um novo corte e aperta a relaxação.
         </p>
+        <p class="section-intro lang-en">
+          Because \(e^{\varepsilon\cdot C}\) is convex, every tangent line is a global underestimator.
+          Outer approximation uses the maximum of these tangents as a piecewise-linear frontier below the exponential curve.
+          Move the slider: every step adds a new cut and tightens the relaxation.
+        </p>
+
+        <div class="oa-layout">
+          <div class="card oa-chart-card">
+            <svg id="oaSvg" viewBox="0 0 820 390" role="img" aria-label="Curva exponencial e aproximação por retas tangentes"></svg>
+          </div>
+
+          <div class="card oa-side">
+            <span id="oaStepBadge" class="step-badge">3 / 6</span>
+            <div class="control-label-row">
+              <strong class="lang-pt">Número de tangentes</strong>
+              <strong class="lang-en">Number of tangents</strong>
+              <span id="oaCount" class="control-value">3</span>
+            </div>
+            <input id="oaSlider" type="range" min="1" max="6" step="1" value="3" aria-label="Número de tangentes" />
+            <div class="range-marks" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+
+            <div class="equation" style="margin-top:18px;">
+              \[
+              z_i\ge e^{\varepsilon\cdot\bar C_i^h}
+              +\varepsilon\cdot e^{\varepsilon\cdot\bar C_i^h}
+              \cdot(C_i-\bar C_i^h)
+              \]
+            </div>
+            <p id="oaExplanation" style="color:var(--muted); font-size:.91rem;"></p>
+            <div class="note" style="margin-top:14px;">
+              <span class="lang-pt"><strong>Leitura correta:</strong> as tangentes não aproximam a curva isoladamente por interpolação. É o <em>máximo</em> dos cortes já adicionados que define a fronteira inferior usada no master MILP.</span>
+              <span class="lang-en"><strong>Correct reading:</strong> the tangents are not simply interpolated between points. The <em>maximum</em> of the cuts already added defines the lower frontier used by the MILP master.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="marcos">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <p class="eyebrow lang-pt">04 · Produção científica</p>
+            <p class="eyebrow lang-en">04 · Scientific outputs</p>
+            <h2 class="lang-pt">Marcos derivados da pesquisa</h2>
+            <h2 class="lang-en">Research outputs and milestones</h2>
+          </div>
+          <a class="back-home" href="#home"><span class="lang-pt">↑ Voltar ao início</span><span class="lang-en">↑ Back to home</span></a>
+        </div>
+
+        <p class="section-intro lang-pt">
+          Esta área concentra materiais públicos e documentos de divulgação relacionados ao desenvolvimento da pesquisa.
+        </p>
+        <p class="section-intro lang-en">
+          This area centralizes public records and dissemination materials produced from the research.
+        </p>
+
+        <div class="milestone-grid">
+          <article class="card milestone">
+            <span class="pill lang-pt">Paper publicado · SBPO 2026</span><span class="pill lang-en">Published paper · SBPO 2026</span>
+            <h3 style="margin-top:14px;">Equity on providing mammography exams</h3>
+            <p class="lang-pt">Trabalho completo apresentado oralmente no LVIII Simpósio Brasileiro de Pesquisa Operacional, na área de PO em Saúde.</p>
+            <p class="lang-en">Complete paper presented orally at the LVIII Brazilian Symposium on Operations Research, in the OR in Healthcare track.</p>
+            <div class="action">
+              <a id="paperLink" class="button-link" href="https://proceedings.science/sbpo-2026/papers/equity-on-providing-mammography-exams?lang=pt-br" target="_blank" rel="noopener noreferrer">
+                <span class="lang-pt">Abrir nos anais ↗</span><span class="lang-en">Open proceedings ↗</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="card milestone">
+            <span class="pill lang-pt">Apresentação oral · SBPO 2026</span><span class="pill lang-en">Oral presentation · SBPO 2026</span>
+            <h3 class="lang-pt" style="margin-top:14px;">Slides da apresentação</h3>
+            <h3 class="lang-en" style="margin-top:14px;">Presentation slides</h3>
+            <p class="lang-pt">Versão dos slides utilizada para apresentar motivação, EDE-KP, modelo, reformulação, OA e resultados computacionais.</p>
+            <p class="lang-en">Slide deck covering motivation, KP-EDE, model, reformulation, OA, and computational results.</p>
+            <div class="action">
+              <a id="slidesLink" class="button-link secondary" href="assets/slides_sbpo_2026.pdf" target="_blank" rel="noopener noreferrer">
+                <span class="lang-pt">Abrir slides ↗</span><span class="lang-en">Open slides ↗</span>
+              </a>
+            </div>
+          </article>
+
+          <article class="card milestone">
+            <span class="pill lang-pt">Divulgação científica · UFMG 2026</span><span class="pill lang-en">Research dissemination · UFMG 2026</span>
+            <h3 class="lang-pt" style="margin-top:14px;">Pôster da Semana do Conhecimento</h3>
+            <h3 class="lang-en" style="margin-top:14px;">Knowledge Week poster</h3>
+            <p class="lang-pt">Pôster que originou este material complementar, com síntese do problema, método, resultados e QR Code de acesso.</p>
+            <p class="lang-en">Poster that originated this supplementary material, summarizing the problem, method, results, and access QR code.</p>
+            <div class="action">
+              <a id="posterLink" class="button-link secondary" href="assets/poster_semana_ic_2026.pdf" target="_blank" rel="noopener noreferrer">
+                <span class="lang-pt">Abrir pôster ↗</span><span class="lang-en">Open poster ↗</span>
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="mapas">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <p class="eyebrow lang-pt">05 · Visualizações espaciais</p>
+            <p class="eyebrow lang-en">05 · Spatial visualizations</p>
+            <h2 class="lang-pt">Minas Gerais em alta resolução</h2>
+            <h2 class="lang-en">Minas Gerais in high resolution</h2>
+          </div>
+          <a class="back-home" href="#home"><span class="lang-pt">↑ Voltar ao início</span><span class="lang-en">↑ Back to home</span></a>
+        </div>
+
+        <p class="section-intro lang-pt">
+          As imagens abaixo usam miniaturas leves para não penalizar o carregamento em celulares. Toque na imagem para abrir a versão em alta resolução,
+          com controles de zoom, ou abra diretamente o arquivo original.
+        </p>
+        <p class="section-intro lang-en">
+          The cards below use lightweight thumbnails so mobile loading remains fast. Tap an image to open the high-resolution version with zoom controls,
+          or open the original file directly.
+        </p>
+
+        <div class="maps-grid">
+          <article class="card map-card">
+            <button class="map-thumb-button" type="button"
+              data-full="assets/mapa_demanda_mg.png"
+              data-title-pt="Distribuição espacial da demanda potencial"
+              data-title-en="Spatial distribution of potential demand">
+              <img src="assets/thumb_mapa_demanda.webp" loading="lazy" decoding="async" alt="Mapa de calor da distribuição espacial da demanda potencial por mamografia em Minas Gerais" />
+            </button>
+            <div class="map-meta">
+              <h3 class="lang-pt">Distribuição espacial da demanda potencial</h3>
+              <h3 class="lang-en">Spatial distribution of potential demand</h3>
+              <p class="lang-pt">Visualização da heterogeneidade espacial da demanda por exames no território mineiro.</p>
+              <p class="lang-en">Visualization of the spatial heterogeneity of screening demand across Minas Gerais.</p>
+              <div class="map-actions">
+                <button class="button-link secondary open-map" type="button"
+                  data-full="assets/mapa_demanda_mg.png"
+                  data-title-pt="Distribuição espacial da demanda potencial"
+                  data-title-en="Spatial distribution of potential demand">
+                  <span class="lang-pt">Ampliar</span><span class="lang-en">Enlarge</span>
+                </button>
+                <a id="mapDemandLink" class="button-link secondary" href="assets/mapa_demanda_mg.png" target="_blank" rel="noopener noreferrer">
+                  <span class="lang-pt">Original ↗</span><span class="lang-en">Original ↗</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card map-card">
+            <button class="map-thumb-button" type="button"
+              data-full="assets/solucao_otimizada_mg.png"
+              data-title-pt="Visualização da configuração otimizada"
+              data-title-en="Optimized configuration visualization">
+              <img src="assets/thumb_solucao_otimizada.webp" loading="lazy" decoding="async" alt="Mapa da configuração otimizada da rede de mamografia em Minas Gerais" />
+            </button>
+            <div class="map-meta">
+              <h3 class="lang-pt">Visualização da configuração otimizada</h3>
+              <h3 class="lang-en">Optimized configuration visualization</h3>
+              <p class="lang-pt">Mapa detalhado da configuração espacial resultante, preservado em resolução superior à impressão do pôster.</p>
+              <p class="lang-en">Detailed map of the resulting spatial configuration, preserved at a higher resolution than the printed poster.</p>
+              <div class="map-actions">
+                <button class="button-link secondary open-map" type="button"
+                  data-full="assets/solucao_otimizada_mg.png"
+                  data-title-pt="Visualização da configuração otimizada"
+                  data-title-en="Optimized configuration visualization">
+                  <span class="lang-pt">Ampliar</span><span class="lang-en">Enlarge</span>
+                </button>
+                <a id="mapSolutionLink" class="button-link secondary" href="assets/solucao_otimizada_mg.png" target="_blank" rel="noopener noreferrer">
+                  <span class="lang-pt">Original ↗</span><span class="lang-en">Original ↗</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <div class="container">
-      Material complementar para divulgação científica. Adapte título, autoria,
-      instituição, referências e os pontos do mapa à versão final do trabalho.
+    <div class="container footer-grid">
+      <p class="lang-pt">
+        Material complementar do trabalho de Iniciação Científica “Equidade no Planejamento de Redes de Mamografia: uma Abordagem de Otimização para Minas Gerais”.
+        UFMG · PIBIC/CNPq · 2026.
+      </p>
+      <p class="lang-en">
+        Supplementary material for the undergraduate research project “Equity in Mammography Network Planning: an Optimization Approach for Minas Gerais”.
+        UFMG · PIBIC/CNPq · 2026.
+      </p>
+      <a href="#home" class="back-home"><span class="lang-pt">↑ Início</span><span class="lang-en">↑ Home</span></a>
     </div>
   </footer>
 
+  <dialog id="imageDialog" class="image-dialog" aria-label="Visualização de imagem em alta resolução">
+    <div class="dialog-toolbar">
+      <strong id="dialogTitle"></strong>
+      <div class="dialog-controls">
+        <button id="zoomOut" type="button" aria-label="Diminuir zoom">−</button>
+        <button id="zoomReset" type="button" aria-label="Restaurar zoom">100%</button>
+        <button id="zoomIn" type="button" aria-label="Aumentar zoom">+</button>
+        <button id="dialogClose" type="button" aria-label="Fechar">×</button>
+      </div>
+    </div>
+    <div class="dialog-scroll">
+      <img id="dialogImage" alt="" />
+    </div>
+  </dialog>
+
+  <noscript>
+    <div class="container" style="padding:18px; margin-top:18px; background:#fff8e7; border:1px solid #ead39a; border-radius:10px;">
+      Esta página utiliza JavaScript apenas para os elementos interativos. O conteúdo matemático e os links principais continuam disponíveis.
+    </div>
+  </noscript>
+
   <script>
-    // -------------------------------------------------------------------------
-    // MAPA DIDÁTICO
-    // -------------------------------------------------------------------------
-    // Os pontos abaixo usam cidades reais apenas para ilustrar a correspondência
-    // entre I, J, t_ij e x_ij. Troque-os pelos dados reais da sua instância se
-    // quiser transformar esta seção em uma visualização factual do estudo.
+    (() => {
+      const root = document.documentElement;
+      const langPt = document.getElementById('langPt');
+      const langEn = document.getElementById('langEn');
+      const paperLink = document.getElementById('paperLink');
+      const slidesLink = document.getElementById('slidesLink');
+      const posterLink = document.getElementById('posterLink');
+      const mapDemandLink = document.getElementById('mapDemandLink');
+      const mapSolutionLink = document.getElementById('mapSolutionLink');
 
-    const map = L.map('map', {
-      scrollWheelZoom: false
-    }).setView([-19.65, -44.15], 9);
+      // -------------------------------------------------------------------
+      // LINKS DOS MATERIAIS
+      // Para usar arquivos compartilhados no Google Drive, substitua somente
+      // as quatro strings abaixo pelos respectivos links de compartilhamento.
+      // Os mapas continuam usando os arquivos locais em assets/ dentro do
+      // visualizador da página; estes links controlam o botão "Original ↗".
+      // -------------------------------------------------------------------
+      const RESOURCE_LINKS = {
+        slides: 'https://drive.google.com/file/d/1-PCFWQPcDDL2yWVaLxynOOO6jr6A3tmA/view?usp=sharing',
+        poster: 'https://drive.google.com/file/d/1yxgC-yC0TPhgiW4kfU20EPofGt-ThES3/view?usp=sharing',
+        mapDemand: 'https://drive.google.com/drive/folders/136f028aP0-qB8PIjj4AOowoKB9IuyaTY?usp=sharing',
+        mapSolution: 'https://drive.google.com/drive/folders/1te8vQO-pjk2CRo9rOB-u4vp1B1zGdkqT?usp=sharing'
+      };
 
-    L.tileLayer(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      {
-        maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      slidesLink.href = RESOURCE_LINKS.slides;
+      posterLink.href = RESOURCE_LINKS.poster;
+      mapDemandLink.href = RESOURCE_LINKS.mapDemand;
+      mapSolutionLink.href = RESOURCE_LINKS.mapSolution;
+
+      let currentLang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'pt';
+
+      const titles = {
+        pt: 'Material complementar — Equidade no planejamento de redes de mamografia',
+        en: 'Supplementary material — Equity in mammography network planning'
+      };
+
+      function setLanguage(lang, updateUrl = true) {
+        currentLang = lang === 'en' ? 'en' : 'pt';
+        root.dataset.uiLang = currentLang;
+        root.lang = currentLang === 'pt' ? 'pt-BR' : 'en';
+        document.title = titles[currentLang];
+        langPt.setAttribute('aria-pressed', String(currentLang === 'pt'));
+        langEn.setAttribute('aria-pressed', String(currentLang === 'en'));
+        paperLink.href = currentLang === 'pt'
+          ? 'https://proceedings.science/sbpo-2026/papers/equity-on-providing-mammography-exams?lang=pt-br'
+          : 'https://proceedings.science/sbpo-2026/papers/equity-on-providing-mammography-exams?lang=en';
+
+        if (updateUrl) {
+          const url = new URL(location.href);
+          if (currentLang === 'en') url.searchParams.set('lang', 'en');
+          else url.searchParams.delete('lang');
+          history.replaceState(null, '', url);
+        }
+        renderEDE();
+        renderOA();
       }
-    ).addTo(map);
 
-    const demandZones = [
-      {
-        name: 'Belo Horizonte',
-        coords: [-19.9167, -43.9345],
-        omega: 'ω₁'
-      },
-      {
-        name: 'Contagem',
-        coords: [-19.9317, -44.0536],
-        omega: 'ω₂'
-      },
-      {
-        name: 'Betim',
-        coords: [-19.9678, -44.1983],
-        omega: 'ω₃'
-      },
-      {
-        name: 'Sabará',
-        coords: [-19.8862, -43.8067],
-        omega: 'ω₄'
-      },
-      {
-        name: 'Nova Lima',
-        coords: [-19.9856, -43.8467],
-        omega: 'ω₅'
+      langPt.addEventListener('click', () => setLanguage('pt'));
+      langEn.addEventListener('click', () => setLanguage('en'));
+
+      // ---------------------------------------------------------------------
+      // EDE-KP: cenários didáticos finitos
+      // ---------------------------------------------------------------------
+      const scenarios = [
+        {
+          costs: [8, 8, 8, 8, 8],
+          title: {pt: 'Nível baixo e perfeitamente igual', en: 'Low level and perfectly equal'},
+          description: {
+            pt: 'Todas as regiões suportam o mesmo burden. Não há desigualdade distributiva; o EDE coincide com a média.',
+            en: 'All regions bear the same burden. There is no distributional inequality; the EDE equals the mean.'
+          }
+        },
+        {
+          costs: [13, 13, 13, 13, 13],
+          title: {pt: 'Nível maior, ainda perfeitamente igual', en: 'Higher level, still perfectly equal'},
+          description: {
+            pt: 'A dispersão continua nula, mas todos estão pior. O EDE sobe porque também é sensível ao nível absoluto dos burdens.',
+            en: 'Dispersion remains zero, but everyone is worse off. The EDE increases because it also responds to the absolute burden level.'
+          }
+        },
+        {
+          costs: [11, 12, 13, 14, 15],
+          title: {pt: 'Desigualdade moderada com média 13', en: 'Moderate inequality with mean 13'},
+          description: {
+            pt: 'A média é a mesma do cenário 2, mas os custos deixam de ser iguais. Para ε>0, o EDE fica acima da média.',
+            en: 'The mean is the same as scenario 2, but burdens are no longer equal. For ε>0, the EDE rises above the mean.'
+          }
+        },
+        {
+          costs: [9, 10, 12, 14, 20],
+          title: {pt: 'Desigualdade maior, ainda com média 13', en: 'Greater inequality, still with mean 13'},
+          description: {
+            pt: 'O nível médio não mudou, mas um burden mais alto aparece na cauda. O termo exponencial dá peso crescente a essa pior experiência.',
+            en: 'The mean level is unchanged, but a larger burden appears in the tail. The exponential term gives increasing weight to this worse experience.'
+          }
+        },
+        {
+          costs: [5, 5, 5, 5, 45],
+          title: {pt: 'Desigualdade extrema com média 13', en: 'Extreme inequality with mean 13'},
+          description: {
+            pt: 'Quatro regiões têm burden baixo, mas uma concentra um custo muito elevado. A média esconde essa situação; o EDE não.',
+            en: 'Four regions have low burdens, but one concentrates a very high cost. The mean hides this situation; the EDE does not.'
+          }
+        },
+        {
+          costs: [12, 14, 18, 22, 34],
+          title: {pt: 'Nível alto e distribuição desigual', en: 'High level and unequal distribution'},
+          description: {
+            pt: 'Agora os dois efeitos atuam juntos: a média sobe para 20 e a distribuição também se torna desigual.',
+            en: 'Now both effects act together: the mean rises to 20 and the distribution is also unequal.'
+          }
+        }
+      ];
+
+      const epsValues = [0, 0.02, 0.04, 0.06, 0.08, 0.12];
+      const scenarioSlider = document.getElementById('scenarioSlider');
+      const epsilonSlider = document.getElementById('epsilonSlider');
+      const scenarioValue = document.getElementById('scenarioValue');
+      const epsilonValue = document.getElementById('epsilonValue');
+      const scenarioTitle = document.getElementById('scenarioTitle');
+      const scenarioDescription = document.getElementById('scenarioDescription');
+      const meanMetric = document.getElementById('meanMetric');
+      const edeMetric = document.getElementById('edeMetric');
+      const gapMetric = document.getElementById('gapMetric');
+      const edeInterpretation = document.getElementById('edeInterpretation');
+      const barArea = document.getElementById('barArea');
+
+      function mean(values) {
+        return values.reduce((a, b) => a + b, 0) / values.length;
       }
-    ];
 
-    demandZones.forEach((zone, idx) => {
-      L.circleMarker(zone.coords, {
-        radius: 8,
-        weight: 3,
-        fillOpacity: 0.2
-      })
-        .addTo(map)
-        .bindPopup(
-          `<strong>Zona de demanda i${idx + 1}</strong><br>
-           ${zone.name}<br>
-           Demanda elegível: ${zone.omega}`
-        );
-    });
-
-    const candidateLocations = [
-      {
-        name: 'Local candidato j1',
-        coords: [-19.9191, -43.9386]
-      },
-      {
-        name: 'Local candidato j2',
-        coords: [-19.9720, -44.2010]
+      function ede(values, eps) {
+        const m = mean(values);
+        if (eps === 0) return m;
+        // Stable log-sum-exp form for the equal-weight didactic case.
+        const maxTerm = Math.max(...values.map(v => eps * v));
+        const avgExpShifted = values.reduce((s, v) => s + Math.exp(eps * v - maxTerm), 0) / values.length;
+        return (Math.log(avgExpShifted) + maxTerm) / eps;
       }
-    ];
 
-    const squareIcon = L.divIcon({
-      className: '',
-      html:
-        '<div style="' +
-        'width:16px;height:16px;background:#172033;' +
-        'border:3px solid white;box-shadow:0 0 0 1px #172033;' +
-        'border-radius:2px;"></div>',
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
-    });
+      function fmt(value, digits = 1) {
+        const locale = currentLang === 'pt' ? 'pt-BR' : 'en-US';
+        return new Intl.NumberFormat(locale, {minimumFractionDigits: digits, maximumFractionDigits: digits}).format(value);
+      }
 
-    candidateLocations.forEach((candidate) => {
-      L.marker(candidate.coords, { icon: squareIcon })
-        .addTo(map)
-        .bindPopup(
-          `<strong>${candidate.name}</strong><br>
-           Possível local de instalação de equipamentos.`
-        );
-    });
+      function renderEDE() {
+        if (!scenarioSlider) return;
+        const sIndex = Number(scenarioSlider.value);
+        const eIndex = Number(epsilonSlider.value);
+        const scenario = scenarios[sIndex];
+        const eps = epsValues[eIndex];
+        const m = mean(scenario.costs);
+        const e = ede(scenario.costs, eps);
+        const gap = e - m;
+        const maxScale = 48;
 
-    // Algumas conexões ilustrativas i -> j.
-    const illustrativeLinks = [
-      [demandZones[0].coords, candidateLocations[0].coords],
-      [demandZones[1].coords, candidateLocations[0].coords],
-      [demandZones[2].coords, candidateLocations[1].coords],
-      [demandZones[3].coords, candidateLocations[0].coords],
-      [demandZones[4].coords, candidateLocations[0].coords]
-    ];
+        scenarioValue.textContent = `${sIndex + 1} / ${scenarios.length}`;
+        epsilonValue.textContent = eps === 0
+          ? 'ε → 0'
+          : `ε = ${currentLang === 'pt' ? fmt(eps, 2) : eps.toFixed(2)}`;
+        scenarioTitle.textContent = scenario.title[currentLang];
+        scenarioDescription.textContent = scenario.description[currentLang];
+        meanMetric.textContent = `${fmt(m)} min`;
+        edeMetric.textContent = `${fmt(e)} min`;
+        gapMetric.textContent = `${gap >= 0 ? '+' : ''}${fmt(gap)} min`;
 
-    illustrativeLinks.forEach((link) => {
-      L.polyline(link, {
-        weight: 2,
-        opacity: 0.55,
-        dashArray: '7 6'
-      }).addTo(map);
-    });
+        barArea.innerHTML = scenario.costs.map((v, i) => {
+          const h = Math.max(3, Math.min(100, (v / maxScale) * 100));
+          return `<div class="bar-column">
+            <span class="bar-value">${fmt(v, 0)}</span>
+            <div class="burden-bar" style="height:${h}%" aria-label="${v} min"></div>
+            <span class="bar-label">R${i + 1}</span>
+          </div>`;
+        }).join('');
+
+        if (eps === 0) {
+          edeInterpretation.textContent = currentLang === 'pt'
+            ? 'No limite ε → 0, o EDE converge para a média ponderada. Nesse limite, a penalização adicional associada à desigualdade desaparece.'
+            : 'As ε → 0, the EDE converges to the weighted mean. In this limit, the additional effect associated with inequality disappears.';
+        } else if (Math.abs(gap) < 0.02) {
+          edeInterpretation.textContent = currentLang === 'pt'
+            ? 'Como todos os burdens são iguais, não existe diferença distributiva a penalizar: EDE = média, qualquer que seja ε.'
+            : 'Because all burdens are equal, there is no distributional difference to penalize: EDE = mean for any ε.';
+        } else if (Math.abs(m - 13) < 0.01) {
+          edeInterpretation.textContent = currentLang === 'pt'
+            ? `A média continua em 13 min, mas o EDE sobe para ${fmt(e)} min. A diferença de ${fmt(gap)} min vem da forma desigual como o burden está distribuído.`
+            : `The mean remains 13 min, but the EDE rises to ${fmt(e)} min. The ${fmt(gap)} min difference comes from the unequal distribution of burden.`;
+        } else {
+          edeInterpretation.textContent = currentLang === 'pt'
+            ? `Neste cenário, o nível médio é ${fmt(m)} min e ainda existe desigualdade. O EDE combina os dois efeitos e chega a ${fmt(e)} min.`
+            : `In this scenario, the mean level is ${fmt(m)} min and inequality is also present. The EDE combines both effects and reaches ${fmt(e)} min.`;
+        }
+      }
+
+      scenarioSlider.addEventListener('input', renderEDE);
+      epsilonSlider.addEventListener('input', renderEDE);
+
+      // ---------------------------------------------------------------------
+      // OA: curva exponencial, tangentes e envelope inferior por partes
+      // ---------------------------------------------------------------------
+      const oaSvg = document.getElementById('oaSvg');
+      const oaSlider = document.getElementById('oaSlider');
+      const oaCount = document.getElementById('oaCount');
+      const oaStepBadge = document.getElementById('oaStepBadge');
+      const oaExplanation = document.getElementById('oaExplanation');
+      const tangentPoints = [2, 7, 12, 17, 22, 27];
+      const oaEps = 0.08;
+
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const chart = {left: 62, top: 24, width: 724, height: 300, xMin: 0, xMax: 30, yMin: 0, yMax: 11.8};
+
+      function sx(x) { return chart.left + ((x - chart.xMin) / (chart.xMax - chart.xMin)) * chart.width; }
+      function sy(y) { return chart.top + chart.height - ((y - chart.yMin) / (chart.yMax - chart.yMin)) * chart.height; }
+      function f(x) { return Math.exp(oaEps * x); }
+      function tangent(x, x0) { return f(x0) + oaEps * f(x0) * (x - x0); }
+
+      function el(name, attrs = {}) {
+        const node = document.createElementNS(svgNS, name);
+        Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+        return node;
+      }
+
+      function pathFromFunction(fn, from = chart.xMin, to = chart.xMax, samples = 180) {
+        let d = '';
+        for (let i = 0; i <= samples; i++) {
+          const x = from + (to - from) * i / samples;
+          const y = fn(x);
+          if (!Number.isFinite(y)) continue;
+          const cmd = d ? 'L' : 'M';
+          d += `${cmd}${sx(x).toFixed(2)},${sy(Math.max(chart.yMin, Math.min(chart.yMax, y))).toFixed(2)} `;
+        }
+        return d.trim();
+      }
+
+      function renderOA() {
+        if (!oaSvg) return;
+        const count = Number(oaSlider.value);
+        const active = tangentPoints.slice(0, count);
+        oaCount.textContent = String(count);
+        oaStepBadge.textContent = `${count} / 6`;
+        oaSvg.innerHTML = '';
+
+        // Background
+        oaSvg.appendChild(el('rect', {x: 0, y: 0, width: 820, height: 390, fill: '#ffffff'}));
+
+        // Grid
+        [2, 4, 6, 8, 10].forEach(v => {
+          oaSvg.appendChild(el('line', {x1: chart.left, y1: sy(v), x2: chart.left + chart.width, y2: sy(v), stroke: '#edf0f4', 'stroke-width': 1}));
+        });
+        [5, 10, 15, 20, 25, 30].forEach(v => {
+          oaSvg.appendChild(el('line', {x1: sx(v), y1: chart.top, x2: sx(v), y2: chart.top + chart.height, stroke: '#f1f3f6', 'stroke-width': 1}));
+        });
+
+        // Axes
+        oaSvg.appendChild(el('line', {x1: chart.left, y1: chart.top + chart.height, x2: chart.left + chart.width, y2: chart.top + chart.height, stroke: '#485467', 'stroke-width': 1.5}));
+        oaSvg.appendChild(el('line', {x1: chart.left, y1: chart.top, x2: chart.left, y2: chart.top + chart.height, stroke: '#485467', 'stroke-width': 1.5}));
+
+        // Curve
+        oaSvg.appendChild(el('path', {
+          d: pathFromFunction(f), fill: 'none', stroke: '#172033', 'stroke-width': 3.1, 'stroke-linecap': 'round'
+        }));
+
+        // Tangents. Clip each *true tangent line* to the chart rectangle.
+        // Do not clamp y while keeping x fixed: that changes the slope and can
+        // make a displayed segment cross above the convex exponential curve.
+        active.forEach((x0) => {
+          const f0 = f(x0);
+          const slope = oaEps * f0;
+          const xAtYMin = x0 + (chart.yMin - f0) / slope;
+          const xAtYMax = x0 + (chart.yMax - f0) / slope;
+          const xStart = Math.max(chart.xMin, Math.min(xAtYMin, xAtYMax));
+          const xEnd = Math.min(chart.xMax, Math.max(xAtYMin, xAtYMax));
+
+          if (xStart <= xEnd) {
+            oaSvg.appendChild(el('line', {
+              x1: sx(xStart), y1: sy(tangent(xStart, x0)),
+              x2: sx(xEnd), y2: sy(tangent(xEnd, x0)),
+              stroke: '#8b96a7', 'stroke-width': 1.6, 'stroke-dasharray': '8 6', opacity: 0.92
+            }));
+          }
+
+          oaSvg.appendChild(el('circle', {
+            cx: sx(x0), cy: sy(f0), r: 4.8,
+            fill: '#1f4b99', stroke: '#ffffff', 'stroke-width': 2
+          }));
+        });
+
+        // Envelope = max of active tangents
+        const envelope = x => Math.max(...active.map(x0 => tangent(x, x0)));
+        oaSvg.appendChild(el('path', {
+          d: pathFromFunction(envelope), fill: 'none', stroke: '#1f4b99', 'stroke-width': 3.2,
+          'stroke-linejoin': 'round', 'stroke-linecap': 'round'
+        }));
+
+        // Labels
+        const xLabel = el('text', {x: chart.left + chart.width / 2, y: 374, 'text-anchor': 'middle', fill: '#5d6678', 'font-size': 14, 'font-family': 'system-ui, sans-serif'});
+        xLabel.textContent = 'C';
+        oaSvg.appendChild(xLabel);
+        const yLabel = el('text', {x: 20, y: chart.top + chart.height / 2, transform: `rotate(-90 20 ${chart.top + chart.height / 2})`, 'text-anchor': 'middle', fill: '#5d6678', 'font-size': 14, 'font-family': 'system-ui, sans-serif'});
+        yLabel.textContent = 'z';
+        oaSvg.appendChild(yLabel);
+
+        // Legend
+        const legendX = chart.left + 14;
+        const legendY = chart.top + 12;
+        const legendW = currentLang === 'pt' ? 246 : 228;
+        const legendH = 80;
+        oaSvg.appendChild(el('rect', {
+          x: legendX - 8, y: legendY - 8, width: legendW, height: legendH,
+          rx: 8, fill: '#ffffff', stroke: '#e1e6ee', 'stroke-width': 1, opacity: 0.96
+        }));
+
+        const legendItems = currentLang === 'pt'
+          ? [
+              {label: 'Exponencial', stroke: '#172033', width: 3.1},
+              {label: 'Retas tangentes', stroke: '#8b96a7', width: 1.6, dash: '8 6'},
+              {label: 'Fronteira de aproximação linear', stroke: '#1f4b99', width: 3.2}
+            ]
+          : [
+              {label: 'Exponential', stroke: '#172033', width: 3.1},
+              {label: 'Tangent lines', stroke: '#8b96a7', width: 1.6, dash: '8 6'},
+              {label: 'Linear approximation frontier', stroke: '#1f4b99', width: 3.2}
+            ];
+
+        legendItems.forEach((item, index) => {
+          const y = legendY + index * 23 + 5;
+          const lineAttrs = {
+            x1: legendX, y1: y, x2: legendX + 34, y2: y,
+            stroke: item.stroke, 'stroke-width': item.width, 'stroke-linecap': 'round'
+          };
+          if (item.dash) lineAttrs['stroke-dasharray'] = item.dash;
+          oaSvg.appendChild(el('line', lineAttrs));
+          const label = el('text', {
+            x: legendX + 44, y: y + 4.5,
+            fill: '#465265', 'font-size': 12.2, 'font-family': 'system-ui, sans-serif'
+          });
+          label.textContent = item.label;
+          oaSvg.appendChild(label);
+        });
+
+        const statements = {
+          pt: [
+            'Com uma única tangente, o master MILP tem um subestimador ainda muito grosseiro da exponencial.',
+            'A segunda tangente eleva o envelope em outra faixa de C e reduz parte da folga da relaxação.',
+            'Com três cortes, a fronteira por partes já acompanha melhor a curvatura em uma região maior.',
+            'Cada novo corte é válido globalmente e só pode apertar — nunca invalidar — a relaxação anterior.',
+            'Cinco tangentes deixam o envelope próximo da curva em grande parte do domínio ilustrado.',
+            'Com seis tangentes, o máximo dos cortes forma uma fronteira inferior bem mais apertada; o princípio é o mesmo usado iterativamente no algoritmo.'
+          ],
+          en: [
+            'With a single tangent, the MILP master still has a very coarse underestimator of the exponential.',
+            'The second tangent raises the envelope over another range of C and removes part of the relaxation slack.',
+            'With three cuts, the piecewise frontier already follows the curvature over a wider region.',
+            'Every new cut is globally valid and can only tighten — never invalidate — the previous relaxation.',
+            'Five tangents make the envelope close to the curve over much of the illustrated domain.',
+            'With six tangents, the maximum of the cuts forms a much tighter lower frontier; the same principle is applied iteratively by the algorithm.'
+          ]
+        };
+        oaExplanation.textContent = statements[currentLang][count - 1];
+      }
+
+      oaSlider.addEventListener('input', renderOA);
+
+      // ---------------------------------------------------------------------
+      // High-resolution image dialog
+      // ---------------------------------------------------------------------
+      const imageDialog = document.getElementById('imageDialog');
+      const dialogImage = document.getElementById('dialogImage');
+      const dialogTitle = document.getElementById('dialogTitle');
+      const zoomIn = document.getElementById('zoomIn');
+      const zoomOut = document.getElementById('zoomOut');
+      const zoomReset = document.getElementById('zoomReset');
+      const dialogClose = document.getElementById('dialogClose');
+      let zoom = 1;
+
+      function applyZoom() {
+        dialogImage.style.width = `${Math.round(zoom * 100)}%`;
+        zoomReset.textContent = `${Math.round(zoom * 100)}%`;
+      }
+
+      function openImage(target) {
+        const src = target.dataset.full;
+        const title = currentLang === 'pt' ? target.dataset.titlePt : target.dataset.titleEn;
+        dialogImage.src = src;
+        dialogImage.alt = title;
+        dialogTitle.textContent = title;
+        zoom = 1;
+        applyZoom();
+        imageDialog.showModal();
+      }
+
+      document.querySelectorAll('.map-thumb-button, .open-map').forEach(btn => {
+        btn.addEventListener('click', () => openImage(btn));
+      });
+
+      zoomIn.addEventListener('click', () => { zoom = Math.min(3, zoom + 0.25); applyZoom(); });
+      zoomOut.addEventListener('click', () => { zoom = Math.max(0.5, zoom - 0.25); applyZoom(); });
+      zoomReset.addEventListener('click', () => { zoom = 1; applyZoom(); });
+      dialogClose.addEventListener('click', () => imageDialog.close());
+      imageDialog.addEventListener('click', (event) => {
+        if (event.target === imageDialog) imageDialog.close();
+      });
+
+      // Initial language is PT-BR unless ?lang=en is explicitly present.
+      setLanguage(currentLang, false);
+    })();
   </script>
 </body>
 </html>
