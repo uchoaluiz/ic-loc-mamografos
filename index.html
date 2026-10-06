@@ -401,22 +401,20 @@
     .equation {
       width: 100%;
       max-width: 100%;
-      min-width: 0;
-
       overflow-x: auto;
       overflow-y: hidden;
-
-      margin: 20px 0;
-      padding: 22px;
-
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      margin: 16px 0;
+      padding: 18px 16px;
+      background: var(--surface-accent);
+      border: 1px solid #d9e4f5;
+      border-radius: 12px;
       text-align: center;
-
       -webkit-overflow-scrolling: touch;
       overscroll-behavior-x: contain;
+    }
+
+    .equation mjx-container {
+      min-width: max-content;
     }
 
     .equation-note {
